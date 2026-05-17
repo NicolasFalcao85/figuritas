@@ -56,6 +56,10 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .search-row input:focus,.search-row select:focus{border-color:var(--blue);outline:none}
 .search-row select{min-width:110px}
 
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:12px;font-weight:600;align-items:center}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+
 /* COUNTRY GRID */
 .country-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 8px}
 .country-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 10px 8px;cursor:pointer;transition:all 0.15s;position:relative;overflow:visible;-webkit-tap-highlight-color:transparent;user-select:none}
@@ -73,7 +77,14 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .cs-miss{background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6}
 .cs-ok{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;font-size:10px}
 
-.badge-repeats{position:absolute;top:-6px;right:-6px;background:var(--badge-blue);color:#fff;font-size:11px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.2);font-family:sans-serif}
+.badge-repeats{position:absolute;top:-6px;right:-6px;background:var(--badge-blue);color:#fff;font-size:11px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.2);animation:popIn 0.2s ease;font-family:sans-serif}
+
+@keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+
+@media(prefers-color-scheme:dark){
+  .cs-miss{background:#3a1010;color:#ff7070;border-color:#5a2020}
+  .cs-ok{background:#0a1e2e;color:#60b0e0;border-color:#1a3a5a}
+}
 
 /* MODAL STRUCTURE */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:flex-end;justify-content:center}
@@ -93,14 +104,14 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .num-btn:active{transform:scale(0.95)}
 .num-btn-badge{position:absolute;top:-4px;right:-4px;background:var(--badge-blue);color:white;font-size:9px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-weight:bold}
 
-/* FORMATOS DE PANELES, CASILLEROS TEXTAREA Y BOTONES MEJORADOS */
-.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
-.panel-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--blue);margin-bottom:8px;border-bottom:2px solid var(--gold);padding-bottom:5px}
-.tip{font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.3}
-textarea{width:100%;min-height:140px;font-family:monospace;font-size:12px;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);resize:vertical;margin-bottom:4px}
-textarea:focus{border-color:var(--blue);outline:none}
-.result-box{background:var(--bg2);border-radius:8px;padding:10px;font-size:13px;line-height:1.8;min-height:44px;word-break:break-all;border-left:3px solid var(--blue);color:var(--text)}
+@media(prefers-color-scheme:dark){
+  .num-btn{background:#252535;color:#888;border-color:#333}
+  .num-btn.have-mark{background:#0a2e1a;border-color:#2ecc71;color:#5ecc80}
+  .num-btn.missing-mark{background:#3a1010;border-color:#e57373;color:#ff7070}
+  .num-btn.repeat-mark{background:#1e293b;border-color:#3b82f6;color:#93c5fd}
+}
 
+/* PANELS & BUTTONS */
 .btn{padding:10px 16px;border:2px solid var(--blue);border-radius:8px;background:var(--card);color:var(--blue);font-size:14px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .btn:active{opacity:0.8;transform:scale(0.97)}
 .btn-primary{background:var(--blue);color:#fff}
@@ -111,11 +122,23 @@ textarea:focus{border-color:var(--blue);outline:none}
 .btn-google:active{background:#eee}
 .btn-block{width:100%;justify-content:center;padding:10px 8px;font-size:13px}
 .btn-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+textarea{width:100%;min-height:120px;font-family:monospace;font-size:12px;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);resize:vertical}
+textarea:focus{border-color:var(--blue);outline:none}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.panel-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--blue);margin-bottom:8px;border-bottom:2px solid var(--gold);padding-bottom:5px}
+.result-box{background:var(--bg2);border-radius:8px;padding:10px;font-size:13px;line-height:1.8;min-height:44px;word-break:break-all;border-left:3px solid var(--blue);color:var(--text)}
+.preview-box{white-space:pre-wrap;max-height:220px;overflow-y:auto;font-size:11px;font-family:monospace;background:var(--bg2);border-radius:8px;padding:12px;border-left:3px solid var(--gold);color:var(--text)}
+.prev-tabs{display:flex;gap:5px;margin-bottom:10px}
+.prev-tab{padding:6px 12px;border:1.5px solid var(--blue);border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--blue);font-family:'Barlow Condensed',sans-serif}
+.prev-tab.active{background:var(--blue);color:#fff}
 
-/* LEGEND */
-.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:12px;font-weight:600;align-items:center}
-.legend-item{display:flex;align-items:center;gap:5px}
-.legend-dot{width:8px;height:8px;border-radius:50%}
+/* COMMUNITY DESIGN */
+.user-row-card{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);padding:10px 14px;border-radius:8px;margin-bottom:8px;border:1px solid var(--border)}
+.user-info-name{font-weight:700;font-size:15px}
+.user-info-pct{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--blue)}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:200;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap}
 
 /* AUTH WALL SCREEN */
 .auth-wall{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -132,7 +155,7 @@ textarea:focus{border-color:var(--blue);outline:none}
       <p style="color:var(--text2);font-size:13px;margin-top:4px">Ingresá para ver las repes y faltantes de tus amigos en tiempo real.</p>
     </div>
     <button class="btn btn-google btn-block" onclick="loginWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.8 2.71v2.24h2.92c1.71-1.58 2.68-3.9 2.68-6.58z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.24c-.8.54-1.84.87-3.04.87-2.34 0-4.33-1.58-5.03-3.71H.95v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.74c-.18-.54-.28-1.12-.28-1.74s.1-1.2.28-1.74V4.96H.95A8.99 8.99 0 0 0 0 9c0 1.46.35 2.85.95 4.09l3.02-2.35z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.3A8.99 8.99 0 0 0 9 0 9 9 0 0 0 .95 4.96l3.02 2.35c.7-2.13 2.69-3.73(5.03-3.73z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.8 2.71v2.24h2.92c1.71-1.58 2.68-3.9 2.68-6.58z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.24c-.8.54-1.84.87-3.04.87-2.34 0-4.33-1.58-5.03-3.71H.95v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.74c-.18-.54-.28-1.12-.28-1.74s.1-1.2.28-1.74V4.96H.95A8.99 8.99 0 0 0 0 9c0 1.46.35 2.85.95 4.09l3.02-2.35z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.3A8.99 8.99 0 0 0 9 0 9 9 0 0 0 .95 4.96l3.02 2.35c.7-2.13 2.69-3.73 5.03-3.73z"/></svg>
       Iniciar Sesión con Google
     </button>
     <div id="auth-error" style="color:var(--red);font-size:12px;margin-top:14px;font-weight:700"></div>
@@ -147,7 +170,10 @@ textarea:focus{border-color:var(--blue);outline:none}
       <div class="header-sub" id="header-user-sub">COMUNIDAD ONLINE</div>
     </div>
   </div>
-  <button class="btn btn-danger" style="padding:5px 10px; font-size:12px; border-radius:6px;" onclick="logout()"><i class="ti ti-logout"></i> Salir</button>
+  <div style="display:flex;align-items:center;gap:6px">
+    <button class="btn btn-primary" style="padding:4px 8px;font-size:11px;background:rgba(255,255,255,0.15);border:none" onclick="triggerManualStatsSync()" title="Recalcular KPIs"><i class="ti ti-refresh"></i> Actualizar</button>
+    <button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="logout()"><i class="ti ti-logout"></i> Salir</button>
+  </div>
 </div>
 <div class="gold-bar"></div>
 
@@ -159,73 +185,139 @@ textarea:focus{border-color:var(--blue);outline:none}
 </div>
 
 <div class="content">
-  <div id="tab-album" class="section active">
-    <div class="stats-row">
-      <div class="stat-card green"><span class="stat-pct" id="s-pct">-</span><div class="stat-label">Completado</div><div class="stat-sub" id="s-have-sub">-</div></div>
-      <div class="stat-card"><span class="stat-num" id="s-total">-</span><div class="stat-label">Me faltan</div></div>
-      <div class="stat-card gold"><span class="stat-num" id="s-repes">-</span><div class="stat-label">Repetidas Totales</div></div>
-    </div>
-    <div class="progress-wrap">
-      <div class="progress-top"><span class="progress-label">Progreso del álbum</span><span class="progress-pct" id="s-pct2">-</span></div>
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-    </div>
-    <div class="search-row">
-      <input type="text" id="search-country" placeholder="Buscar equipo..." oninput="renderCountries()">
-      <select id="filter-mode" onchange="renderCountries()">
-        <option value="all">Todos</option>
-        <option value="missing">Faltantes</option>
-        <option value="complete">Completos</option>
-        <option value="repeats">Con Repetidas</option>
-      </select>
-    </div>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Azul = Cantidad Repes</div>
-    </div>
-    <div class="country-grid" id="country-grid"></div>
-  </div>
 
-  <div id="tab-comu" class="section">
-    <div class="panel"><div class="panel-title">Usuarios en línea</div><div id="community-users-list">Cargando comunidad...</div></div>
-    <div class="panel" id="panel-deal-result" style="display:none">
-      <div class="panel-title" id="deal-title">Trato sugerido</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div><h4 style="font-size:12px;color:#1a7a3c;margin-bottom:4px">Te da</h4><div class="result-box" id="deal-he-gives">—</div></div>
-        <div><h4 style="font-size:12px;color:var(--red);margin-bottom:4px">Le das</h4><div class="result-box" id="deal-you-give">—</div></div>
+<div id="tab-album" class="section active">
+  <div class="stats-row">
+    <div class="stat-card green">
+      <span class="stat-pct" id="s-pct">0%</span>
+      <div class="stat-label">Completado</div>
+      <div class="stat-sub" id="s-have-sub">0 / 994</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="s-total">0</span>
+      <div class="stat-label">Me faltan</div>
+    </div>
+    <div class="stat-card gold">
+      <span class="stat-num" id="s-repes">0</span>
+      <div class="stat-label">Repetidas Totales</div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <span class="progress-label">Progreso del álbum</span>
+      <span class="progress-pct" id="s-pct2">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div class="search-row">
+    <input type="text" id="search-country" placeholder="Buscar equipo..." oninput="renderCountries()">
+    <select id="filter-mode" onchange="renderCountries()">
+      <option value="all">Todos</option>
+      <option value="missing">Faltantes</option>
+      <option value="complete">Completos</option>
+      <option value="repeats">Con Repetidas</option>
+    </select>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Azul = Cantidad Repes</div>
+  </div>
+  <div class="country-grid" id="country-grid"></div>
+</div>
+
+<div id="tab-comu" class="section">
+  <div class="panel">
+    <div class="panel-title">Usuarios en línea</div>
+    <div id="community-users-list">Cargando comunidad...</div>
+  </div>
+  <div class="panel" id="panel-deal-result" style="display:none">
+    <div class="panel-title" id="deal-title">Trato sugerido</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <h4 style="font-size:12px;color:#1a7a3c;margin-bottom:4px">Te da (Le faltan a tu amigo)</h4>
+        <div class="result-box" id="deal-he-gives">—</div>
       </div>
-      <button class="btn btn-wa btn-block" id="deal-wa-btn" style="margin-top:10px;"><i class="ti ti-brand-whatsapp"></i> Proponer Cambio Directo</button>
+      <div>
+        <h4 style="font-size:12px;color:var(--red);margin-bottom:4px">Le das (Le sirven a él)</h4>
+        <div class="result-box" id="deal-you-give">—</div>
+      </div>
     </div>
-  </div>
-
-  <div id="tab-cross" class="section">
-    <div class="panel">
-      <div class="panel-title">Me ofrecen</div>
-      <div class="tip">Pegá la lista de repetidas de otra persona para ver cuáles te sirven.</div>
-      <textarea id="cross-input" placeholder="Repetidas&#10;FWC: 11&#10;KOR: 4, 8"></textarea>
-      <div class="btn-row"><button class="btn btn-primary" onclick="doCross()">Cruzar</button><button class="btn" onclick="clearCross()">Limpiar</button></div>
-    </div>
-    <div class="panel">
-      <div class="panel-title">Las que te sirven</div>
-      <div class="result-box" id="cross-result">—</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--blue);margin:8px 0" id="cross-count">—</div>
-      <button class="btn btn-success" onclick="syncCrossedFigus()" id="sync-cross-btn" style="display:none">Sincronizar a mi Álbum</button>
-    </div>
-  </div>
-
-  <div id="tab-import" class="section">
-    <div class="panel">
-      <div class="panel-title">Formato completo de la app</div>
-      <div class="tip">Pegá todo el bloque de texto con las secciones "Me faltan" y "Repetidas" para pisar tu álbum.</div>
-      <textarea id="import-full" style="min-height:150px" placeholder="Figuritas App - Lista&#10;Me faltan&#10;FWC 🏆: 1, 2&#10;...&#10;Repetidas&#10;FWC 📜: 11"></textarea>
-      <div class="btn-row"><button class="btn btn-primary btn-block" onclick="importFull()"><i class="ti ti-check"></i> Cargar todo (Pisar Álbum)</button></div>
-      <div id="import-full-status" style="margin-top:12px; padding:12px; border-radius:8px; font-weight:600; display:none;"></div>
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn btn-wa btn-block" id="deal-wa-btn"><i class="ti ti-brand-whatsapp"></i> Proponer Cambio Directo</button>
     </div>
   </div>
 </div>
 
+<div id="tab-cross" class="section">
+  <div class="panel">
+    <div class="panel-title">Me ofrecen</div>
+    <div class="tip" style="margin-bottom:8px">Pegá la lista de repetidas de otra persona para ver cuáles te sirven.</div>
+    <textarea id="cross-input" placeholder="Repetidas&#10;FWC: 11&#10;KOR: 4, 8"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="doCross()"><i class="ti ti-search"></i> Cruzar</button>
+      <button class="btn" onclick="clearCross()"><i class="ti ti-trash"></i> Limpiar</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Las que te sirven</div>
+    <div class="result-box" id="cross-result">—</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--blue);margin:8px 0" id="cross-count">—</div>
+    <div class="btn-row">
+      <button class="btn btn-success" onclick="syncCrossedFigus()" id="sync-cross-btn" style="display:none"><i class="ti ti-download"></i> Sincronizar a mi Álbum</button>
+    </div>
+  </div>
+</div>
+
+<div id="tab-import" class="section">
+  <div class="panel">
+    <div class="panel-title">Formato completo de la app</div>
+    <div class="tip" style="margin-bottom:8px">Pegá todo el bloque de texto con las secciones "Me faltan" y "Repetidas".</div>
+    <textarea id="import-full" style="min-height:150px" placeholder="Figuritas App - Lista&#10;Me faltan&#10;FWC 🏆: 1, 2&#10;...&#10;Repetidas&#10;FWC 📜: 11"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="importFull('both')"><i class="ti ti-check"></i> Cargar todo</button>
+      <button class="btn" onclick="importFull('missing')" style="font-size:12px">Solo faltan</button>
+      <button class="btn" onclick="importFull('repeats')" style="font-size:12px">Solo repes</button>
+    </div>
+    <div id="import-full-status" style="margin-top:12px; padding:10px; border-radius:8px; font-weight:600; display:none;"></div>
+  </div>
+</div>
+
+<div id="tab-share" class="section">
+  <div class="share-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;" onclick="shareAll('missing')">❌ Faltantes</div>
+    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;" onclick="shareAll('repeats')">🔄 Repes</div>
+    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;border-color:var(--gold)" onclick="shareAll('both')">📋 Todo</div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Vista previa de tus listas de texto</div>
+    <div class="prev-tabs">
+      <button class="prev-tab active" id="pt-missing" onclick="setPreview('missing')">❌ Faltan</button>
+      <button class="prev-tab" id="pt-repeats" onclick="setPreview('repeats')">🔄 Repes</button>
+    </div>
+    <div class="preview-box" id="share-preview-box">—</div>
+  </div>
+</div>
+
+</div>
+
 <div id="modal-bg" class="modal-bg" onclick="closeModal(event)">
-  <div class="modal" onclick="event.stopPropagation()"><div class="modal-head"><div class="modal-title"><span id="modal-flag-span"></span><span id="modal-name"></span></div><button class="close-btn" onclick="closeModal()">✕</button></div><div class="modal-body"><div class="num-grid" id="modal-nums"></div></div></div>
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title">
+        <span id="modal-flag-span"></span>
+        <span id="modal-name"></span>
+      </div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="num-grid" id="modal-nums"></div>
+      <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center;line-height:1.4">
+        👉 <b>Click normal:</b> Falta ➔ Tengo ➔ Sumar Repes (+1)<br>
+        👉 <b>Mantené apretado / Click derecho:</b> Restar Repes ➔ Tengo ➔ Falta
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="toast">¡ACCION REALIZADA!</div>
@@ -254,6 +346,7 @@ let missing = {};
 let repeats = {};
 let globalUsersDatabase = {};
 let lastCrossedMatches = [];
+let curPreview = 'missing';
 
 const TOTAL_FIGUS = 994;
 const PAISES = ['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
@@ -263,25 +356,18 @@ const MAX = {'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
 
 window.loginWithGoogle = async function() {
-  try { await signInWithPopup(auth, provider); } catch (e) { document.getElementById('auth-error').textContent = e.message; }
+  const errDiv = document.getElementById('auth-error');
+  errDiv.textContent = "";
+  try { await signInWithPopup(auth, provider); } catch (e) { errDiv.textContent = "Error al conectar: " + e.message; }
 }
+
 window.logout = function() { signOut(auth); }
 
 onAuthStateChanged(auth, async (user) => {
   if(user) {
     currentUser = user;
     document.getElementById('auth-screen').style.display = 'none';
-    
-    onSnapshot(doc(db, "users", user.uid), (docSnap) => {
-      if(docSnap.exists()) {
-        const data = docSnap.data();
-        missing = data.missing || {};
-        repeats = data.repeats || {};
-        document.getElementById('header-user-sub').textContent = `HOLA, ${(data.name || "AMIGO").toUpperCase()}!`;
-      }
-      renderAll(); 
-    });
-    
+    await pullUserDataAndForceSync(); 
     listenCommunityChannels();
   } else {
     currentUser = null;
@@ -289,16 +375,34 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-async function writeDataToCloud(newMissing, newRepeats) {
+async function pullUserDataAndForceSync() {
   if(!currentUser) return;
-  try {
-    await setDoc(doc(db, "users", currentUser.uid), {
-      name: currentUser.displayName || "Amigo",
-      email: currentUser.email,
-      missing: newMissing,
-      repeats: newRepeats
-    }, { merge: false });
-  } catch(e) { console.error("Error escribiendo en la nube:", e); }
+  const userRef = doc(db, "users", currentUser.uid);
+  const userDoc = await getDoc(userRef);
+  
+  if (userDoc.exists()) {
+    const data = userDoc.data();
+    missing = data.missing || {};
+    repeats = data.repeats || {};
+    document.getElementById('header-user-sub').textContent = `HOLA, ${(data.name || "AMIGO").toUpperCase()}!`;
+  } else {
+    const initialMissing = {};
+    PAISES.forEach(p => { initialMissing[p] = []; for(let i=1; i<=getMax(p); i++) initialMissing[p].push(i); });
+    missing = initialMissing; repeats = {};
+    await setDoc(userRef, { name: currentUser.displayName || "Amigo", email: currentUser.email, missing: missing, repeats: repeats });
+    document.getElementById('header-user-sub').textContent = `HOLA, ${(currentUser.displayName || "AMIGO").toUpperCase()}!`;
+  }
+  renderAll(); 
+}
+
+window.triggerManualStatsSync = async function() {
+  showToast("🔄 Sincronizando con la nube...");
+  await pullUserDataAndForceSync();
+}
+
+async function syncToCloud() {
+  if(!currentUser) return;
+  try { await setDoc(doc(db, "users", currentUser.uid), { missing: missing, repeats: repeats }, { merge: true }); } catch(e) { console.error(e); }
 }
 
 function listenCommunityChannels() {
@@ -308,24 +412,28 @@ function listenCommunityChannels() {
     snapshot.forEach(docSnap => {
       const id = docSnap.id; const uData = docSnap.data(); globalUsersDatabase[id] = uData;
       if(currentUser && id === currentUser.uid) return;
+      
       let coreHave = 0;
       PAISES.forEach(p => {
         const mSet = new Set(uData.missing?.[p] || []);
         for(let i=1; i<=getMax(p); i++) if(!mSet.has(i)) coreHave++;
       });
       const pct = Math.round((coreHave / TOTAL_FIGUS) * 100);
+
       const row = document.createElement('div');
       row.className = 'user-row-card';
       row.innerHTML = `<div><div class="user-info-name">${uData.name || "Amigo"}</div><div class="user-info-pct">Progreso: ${pct}%</div></div><button class="btn btn-primary" style="padding:6px 12px; font-size:12px;"><i class="ti ti-arrows-cross"></i> Ver Cruce</button>`;
       row.querySelector('button').onclick = () => calculateLiveCrossDeal(id);
       listDiv.appendChild(row);
     });
+    if(listDiv.innerHTML === "") listDiv.innerHTML = "<div class='tip'>No hay otros usuarios todavía.</div>";
   });
 }
 
 function calculateLiveCrossDeal(friendId) {
   const friend = globalUsersDatabase[friendId]; if(!friend) return;
   const youGiveMatches = []; const heGivesMatches = [];
+
   for(const [p, repObj] of Object.entries(friend.repeats || {})) {
     const myM = missing[p] || [];
     Object.keys(repObj).forEach(nStr => { if(myM.includes(parseInt(nStr)) && repObj[nStr] > 0) heGivesMatches.push(`${p}${nStr}`); });
@@ -335,72 +443,152 @@ function calculateLiveCrossDeal(friendId) {
     Object.keys(repObj).forEach(nStr => { if(friendM.includes(parseInt(nStr)) && repObj[nStr] > 0) youGiveMatches.push(`${p}${nStr}`); });
   }
   document.getElementById('panel-deal-result').style.display = 'block';
+  document.getElementById('deal-title').textContent = `Intercambio óptimo con ${friend.name}`;
   const hgBox = document.getElementById('deal-he-gives'); const ygBox = document.getElementById('deal-you-give');
   hgBox.textContent = heGivesMatches.length > 0 ? heGivesMatches.join(', ') : "Ninguna :(";
   ygBox.textContent = youGiveMatches.length > 0 ? youGiveMatches.join(', ') : "Ninguna :(";
+
+  document.getElementById('deal-wa-btn').onclick = () => {
+    const text = `⚽ *¡Hola ${friend.name}! Cruzando nuestro panel de figus vi que podemos cambiar:* \n\n➕ *Me das:* ${hgBox.textContent}\n➖ *Te doy:* ${ygBox.textContent}\n\n¿Cambiamos? 🤝`;
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  };
+}
+
+function parseText(text){
+  const result={};
+  for(const raw of text.split('\n')){
+    const line=raw.trim();
+    if(!line||/^(figuritas app|usa méx|me faltan|repetidas|descarga|https?:)/i.test(line))continue;
+    const hm=line.match(/^#([A-Z]{2,4})(\d+)/i);
+    if(hm){
+      const p=hm[1].toUpperCase(),n=parseInt(hm[2]); if(PAISES.includes(p)&&n>0){if(!result[p])result[p]=[];result[p].push(n);}
+      continue;
+    }
+    const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d]/g,' ').trim();
+    const m=s.match(/^([A-Z]{2,4})\b[^:]*:\s*([\d,\s]+)/i);
+    if(m){
+      const p=m[1].toUpperCase();
+      if(PAISES.includes(p)){
+        const nums = m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
+        if(nums.length){if(!result[p])result[p]=[];result[p]=[...new Set([...result[p],...nums])].sort((a,b)=>a-b);}
+      }
+    }
+  }
+  return result;
 }
 
 function parseFullExport(text){
   let mode=null; const mis={}, rep={};
-  for(const p of PAISES) mis[p] = []; 
-  
   for(const raw of text.split('\n')){
     const line=raw.trim();if(!line)continue;
     if(/me faltan/i.test(line)){mode='missing';continue;}
     if(/^repetidas/i.test(line)){mode='repeats';continue;}
     if(/^(figuritas app|usa méx|descarga|https?:)/i.test(line)){mode=null;continue;}
     if(!mode)continue;
+    const hm=line.match(/^#([A-Z]{2,4})(\d+)/i);
+    if(hm){
+      const p=hm[1].toUpperCase(),n=parseInt(hm[2]);
+      if(PAISES.includes(p)&&n>0){ if(mode==='missing'){ if(!mis[p])mis[p]=[]; mis[p].push(n); } else { if(!rep[p])rep[p]={}; rep[p][n]=(rep[p][n]||0)+1; } }
+      continue;
+    }
     const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d]/g,' ').trim();
     const m=s.match(/^([A-Z]{2,4})\b[^:]*:\s*([\d,\s]+)/i);
     if(m){
       const p=m[1].toUpperCase();
       if(PAISES.includes(p)){
         const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
-        if(nums.length){ if(mode==='missing'){ mis[p]=[...new Set([...mis[p],...nums])].sort((a,b)=>a-b); } else { if(!rep[p])rep[p]={}; nums.forEach(n=>{rep[p][n]=(rep[p][n]||0)+1;}); } }
+        if(nums.length){ if(mode==='missing'){ if(!mis[p])mis[p]=[]; mis[p]=[...new Set([...mis[p],...nums])].sort((a,b)=>a-b); } else { if(!rep[p])rep[p]={}; nums.forEach(n=>{rep[p][n]=(rep[p][n]||0)+1;}); } }
       }
     }
   }
   return {missing:mis,repeats:rep};
 }
 
-window.importFull = async function() {
+// RESTAURADO: El importador masivo con alerta de éxito y resumen de conteo real
+window.importFull = function(modeSelect) {
   const text = document.getElementById('import-full').value;
   const parsed = parseFullExport(text);
   const status = document.getElementById('import-full-status');
   
-  let totalMis = 0;
-  let totalRep = 0;
+  let mk = Object.keys(parsed.missing).length;
+  let rk = Object.keys(parsed.repeats).length;
   
-  for(const p of PAISES) {
-    const repObj = parsed.repeats[p] || {};
-    Object.keys(repObj).forEach(numStr => {
-      const num = parseInt(numStr);
-      parsed.missing[p] = parsed.missing[p].filter(x => x !== num);
-    });
-    totalMis += parsed.missing[p].length;
-    totalRep += Object.values(repObj).reduce((a,b)=>a+b,0);
+  if(!mk && !rk) { 
+    status.style.display = "block";
+    status.style.background = "#fff0f0";
+    status.style.color = "var(--red)";
+    status.textContent = "❌ No se encontraron datos válidos. Copiá el texto completo de la app."; 
+    return; 
   }
-
-  status.style.display = "block";
-  status.style.background = "#f5f5f5";
-  status.style.color = "#111";
-  status.style.border = "1px solid #ccc";
-  status.textContent = "Procesando y subiendo datos a la nube...";
-
-  await writeDataToCloud(parsed.missing, parsed.repeats);
   
+  let countFaltantesCargadas = 0;
+  let countRepesCargadas = 0;
+
+  if(modeSelect === 'both' || modeSelect === 'missing') {
+    if(mk) {
+      missing = parsed.missing;
+      Object.values(missing).forEach(arr => countFaltantesCargadas += arr.length);
+    }
+  }
+  if(modeSelect === 'both' || modeSelect === 'repeats') {
+    if(rk) {
+      repeats = {}; 
+      for(const [p,obj] of Object.entries(parsed.repeats)) { 
+        repeats[p] = obj; 
+        if(!missing[p]) missing[p] = [];
+        Object.keys(obj).forEach(numStr => {
+          const num = parseInt(numStr);
+          missing[p] = missing[p].filter(x => x !== num);
+        });
+        Object.values(obj).forEach(cant => countRepesCargadas += cant);
+      }
+    }
+  }
+  
+  syncToCloud(); 
+  renderAll();
+  
+  // Mostrar cuadro informativo de éxito
+  status.style.display = "block";
   status.style.background = "#f0fff4";
   status.style.color = "#1a7a3c";
   status.style.border = "1.5px solid #81c784";
-  status.innerHTML = `✓ ¡Álbum pisado con éxito!<br><span style="font-size: 12px; font-weight: normal;">Cargadas <b>${totalMis}</b> faltantes y <b>${totalRep}</b> repetidas totales.</span>`;
-  showToast("¡ÁLBUM REEMPLAZADO COMPLETAMENTE!");
+  status.innerHTML = `✓ ¡Álbum cargado correctamente!<br><span style="font-size: 12px; font-weight: normal; opacity: 0.85;">Se detectaron e importaron <b>${countFaltantesCargadas}</b> faltantes y <b>${countRepesCargadas}</b> repetidas. Los datos ya están respaldados en tu cuenta.</span>`;
+  
+  showToast("¡DATOS SINCRONIZADOS EN LA NUBE!");
+}
+
+window.doCross = function() {
+  const offered = parseText(document.getElementById('cross-input').value);
+  lastCrossedMatches = [];
+  for(const [p,nums] of Object.entries(offered)){
+    const myM = missing[p]||[];
+    for(const n of nums) if(myM.includes(n)) lastCrossedMatches.push({pais:p, numero:n});
+  }
+  const res = document.getElementById('cross-result');
+  document.getElementById('cross-count').textContent = lastCrossedMatches.length + ' figuritas coinciden';
+  if(!lastCrossedMatches.length) { res.textContent = 'Ninguna coincide :('; document.getElementById('sync-cross-btn').style.display='none'; return; }
+  res.textContent = lastCrossedMatches.map(m=>`${m.pais}${m.numero}`).join(', ');
+  document.getElementById('sync-cross-btn').style.display='inline-flex';
+}
+
+window.syncCrossedFigus = function() {
+  lastCrossedMatches.forEach(item => { if(missing[item.pais]) missing[item.pais] = missing[item.pais].filter(x => x !== item.numero); });
+  syncToCloud(); renderAll(); showToast("¡Sincronizadas al álbum!"); clearCross();
+}
+
+window.clearCross = function() {
+  document.getElementById('cross-input').value=''; document.getElementById('cross-result').textContent='—';
+  document.getElementById('cross-count').textContent='—'; document.getElementById('sync-cross-btn').style.display='none';
 }
 
 function getHaveCount(p){
   const max = getMax(p);
   const mArr = missing[p] || [];
   let c = 0;
-  for(let i = 1; i <= max; i++) { if(!mArr.includes(i)) c++; }
+  for(let i = 1; i <= max; i++){
+    if(!mArr.includes(i)) c++; 
+  }
   return c;
 }
 
@@ -408,7 +596,9 @@ function updateStats(){
   let totalFaltantes=0, totalRepesAbsolutas=0, totalTengoUnicas=0;
   for(const p of PAISES){
     totalFaltantes += (missing[p]||[]).length;
-    if(repeats[p]) Object.values(repeats[p]).forEach(cant => { totalRepesAbsolutas += cant; });
+    if(repeats[p]) {
+      Object.values(repeats[p]).forEach(cant => { totalRepesAbsolutas += cant; });
+    }
     totalTengoUnicas += getHaveCount(p);
   }
   const pct = Math.round((totalTengoUnicas / TOTAL_FIGUS) * 100);
@@ -416,4 +606,137 @@ function updateStats(){
   document.getElementById('s-repes').textContent = totalRepesAbsolutas; 
   document.getElementById('s-pct').textContent = pct + '%';
   document.getElementById('s-pct2').textContent = pct + '%';
-  document.getElementById('s-have-sub').textContent = total
+  document.getElementById('s-have-sub').textContent = totalTengoUnicas + ' / ' + TOTAL_FIGUS;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+window.renderCountries = function() {
+  const filter = document.getElementById('filter-mode').value;
+  const search = document.getElementById('search-country').value.toUpperCase();
+  const grid = document.getElementById('country-grid'); grid.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  
+  for(const p of PAISES){
+    if(search && !p.includes(search) && !NAMES[p].toUpperCase().includes(search)) continue;
+    const m = (missing[p]||[]).length;
+    let totalRepes = 0; 
+    if(repeats[p]) {
+      Object.values(repeats[p]).forEach(cant => { totalRepes += cant; });
+    }
+    
+    if(filter==='missing' && m===0) continue;
+    if(filter==='complete' && m>0) continue;
+    if(filter==='repeats' && totalRepes===0) continue;
+    
+    const card = document.createElement('div'); card.className = 'country-card' + (m>0?' has-missing':' complete');
+    if(totalRepes > 0){
+      const rb = document.createElement('div'); rb.className = 'badge-repeats'; rb.textContent = totalRepes; card.appendChild(rb);
+    }
+    const flagRow = document.createElement('div'); flagRow.className = 'card-flag-row';
+    const fc = document.createElement('div'); fc.className = 'flag-cell';
+    const fs = document.createElement('span'); fs.textContent = EMOJI[p]||''; fs.style.fontSize = '20px';
+    fc.appendChild(fs); flagRow.appendChild(fc);
+    
+    const nm = document.createElement('div'); nm.className = 'country-code'; nm.textContent = p;
+    flagRow.appendChild(nm); card.appendChild(flagRow);
+    
+    const st = document.createElement('div'); st.className = 'card-stats';
+    st.innerHTML = m > 0 ? `<div class="cs-item cs-miss"><i class="ti ti-x"></i>${m}</div>` : `<div class="cs-item cs-ok"><i class="ti ti-check"></i>OK</div>`;
+    card.appendChild(st); card.onclick = () => openModal(p); frag.appendChild(card);
+  }
+  grid.appendChild(frag); 
+  tw(grid); 
+}
+
+let curPais = '';
+function openModal(p){
+  curPais = p; document.getElementById('modal-flag-span').textContent = EMOJI[p]||'';
+  document.getElementById('modal-name').textContent = ' ' + p + ' — ' + NAMES[p];
+  renderModalNumbers(); document.getElementById('modal-bg').classList.add('open');
+}
+
+function renderModalNumbers() {
+  const p = curPais; const repObj = repeats[p]||{};
+  const grid = document.getElementById('modal-nums'); grid.innerHTML = '';
+  
+  for(let i=1; i<=getMax(p); i++){
+    const inM = missing[p]?.includes(i); const cantRep = repObj[i]||0; 
+    const btn = document.createElement('button'); btn.textContent = i;
+    
+    if(inM){ btn.className = 'num-btn missing-mark'; } 
+    else if(cantRep > 0){
+      btn.className = 'num-btn repeat-mark';
+      const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = cantRep; btn.appendChild(nb);
+    } else { btn.className = 'num-btn have-mark'; }
+    
+    btn.onclick = () => {
+      if(!missing[p]) missing[p] = [];
+      if(!repeats[p]) repeats[p] = {};
+      
+      if(missing[p].includes(i)) { 
+        missing[p] = missing[p].filter(x => x !== i); 
+      }
+      else if(cantRep === 0) { 
+        repeats[p][i] = 1; 
+      }
+      else { 
+        repeats[p][i]++; 
+      }
+      renderModalNumbers(); 
+      updateStats(); 
+      syncToCloud(); 
+    };
+    
+    btn.oncontextmenu = (e) => {
+      e.preventDefault();
+      if(!missing[p]) missing[p] = [];
+      if(!repeats[p]) repeats[p] = {};
+
+      if(cantRep > 1) { 
+        repeats[p][i]--; 
+      } else if(cantRep === 1) { 
+        delete repeats[p][i]; 
+      }
+      else if(!missing[p].includes(i)) { 
+        missing[p].push(i); missing[p].sort((a,b)=>a-b); 
+      }
+      renderModalNumbers(); 
+      updateStats(); 
+      syncToCloud(); 
+    };
+    grid.appendChild(btn);
+  }
+}
+
+window.closeModal = function(e){ if(!e || e.target === document.getElementById('modal-bg')){ document.getElementById('modal-bg').classList.remove('open'); document.body.style.overflow = ''; renderCountries(); } }
+
+window.showTab = function(t) {
+  document.querySelectorAll('.tab').forEach((el,i)=>{el.classList.toggle('active',['album','comu','cross','import'][i]===t)});
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='album') renderCountries(); if(t==='share') setPreview(curPreview);
+  
+  // Limpia el estado de importación al cambiar de pestaña para que no quede viejo
+  if(t!=='import') {
+    const s = document.getElementById('import-full-status');
+    if(s) s.style.display = "none";
+  }
+}
+
+window.setPreview = function(t) { curPreview = t; document.getElementById('share-preview-box').textContent = buildText(t); document.getElementById('pt-missing').classList.toggle('active', t==='missing'); document.getElementById('pt-repeats').classList.toggle('active', t==='repeats'); }
+
+function buildText(type){
+  const hdr = type=='missing'?'Me faltan':'Repetidas'; const lines = [`⚽ *Figus Panini - FIFA World Cup 2026*`,`*${hdr}*`,''];
+  for(const p of PAISES){
+    if(type==='missing'){ const nums = missing[p]||[]; if(nums.length) lines.push(`${EMOJI[p]||''} ${p}: ${nums.join(', ')}`); }
+    else { const repObj = repeats[p]||{}; const repArr = []; Object.keys(repObj).forEach(n=>{ if(repObj[n]>0) repArr.push(repObj[n]>1?`${n}(x${repObj[n]})` : `${n}`); }); if(repArr.length) lines.push(`${EMOJI[p]||''} ${p}: ${repArr.join(', ')}`); }
+  }
+  return lines.join('\n');
+}
+
+window.shareAll = function(type) { navigator.clipboard.writeText(buildText(type)).then(()=>showToast("¡Copiado al portapapeles!")); }
+function showToast(msg){ const el = document.getElementById('toast'); el.textContent = msg; el.style.opacity = '1'; setTimeout(()=>el.style.opacity='0', 1800); }
+function renderAll(){ renderCountries(); updateStats(); }
+</script>
+</body>
+</html>
