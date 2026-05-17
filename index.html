@@ -12,8 +12,8 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--red:#E8192C;--blue:#003DA5;--gold:#FFB81C;--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#777;--border:#e0e0e0;--bg2:#f5f5f5;--badge-blue:#2563eb}
-@media(prefers-color-scheme:dark){:root{--bg:#0f0f1a;--card:#1c1c2e;--text:#f0f0f0;--text2:#999;--border:#2a2a3a;--bg2:#252535}}
+:root{--red:#E8192C;--blue:#003DA5;--gold:#FFB81C;--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#777;--border:#e0e0e0;--bg2:#f5f5f5;--badge-blue:#2563eb;--badge-dark:#1d4ed8}
+@media(prefers-color-scheme:dark){:root{--bg:#0f0f1a;--card:#1c1c2e;--text:#f0f0f0;--text2:#999;--border:#2a2a3a;--bg2:#252535;--badge-blue:#3b82f6;--badge-dark:#1d4ed8}}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Barlow Condensed',sans-serif;-webkit-tap-highlight-color:transparent}
 body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 
@@ -61,7 +61,7 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .legend-dot{width:8px;height:8px;border-radius:50%}
 
 /* COUNTRY GRID */
-.country-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.country-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 8px}
 .country-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 10px 8px;cursor:pointer;transition:all 0.15s;position:relative;overflow:visible;-webkit-tap-highlight-color:transparent;user-select:none}
 .country-card:active{transform:scale(0.96);opacity:0.9}
 .country-card.has-missing{border-top:3px solid var(--red)}
@@ -77,13 +77,14 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .cs-miss{background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6}
 .cs-ok{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;font-size:10px}
 
-/* NOTIFICATION BADGE FOR REPEATS */
-.badge-repeats{position:absolute;top:-6px;right:-6px;background:var(--badge-blue);color:#fff;font-size:11px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.2);animation:popIn 0.2s ease;font-family:sans-serif}
+/* INTERACTIVE QUICK CONTROLS BADGE */
+.badge-repeats-container{position:absolute;top:-8px;right:-4px;background:var(--badge-blue);color:#fff;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.25);transition:all 0.2s cubic-bezier(0.4,0,0.2,1);overflow:hidden;z-index:5;font-family:sans-serif;padding:0 4px}
+.badge-repeats-container.collapsed{width:22px;padding:0}
+.badge-repeats-container.expanded{width:68px}
 
-@keyframes popIn {
-  0% { transform: scale(0); }
-  100% { transform: scale(1); }
-}
+.badge-btn{width:18px;height:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.25);border:none;color:#fff;font-size:12px;font-weight:bold;border-radius:50%;cursor:pointer;transition:background 0.1s}
+.badge-btn:active{background:rgba(255,255,255,0.45)}
+.badge-display{font-size:11px;font-weight:800;min-width:14px;text-align:center;margin:0 4px;user-select:none}
 
 @media(prefers-color-scheme:dark){
   .cs-miss{background:#3a1010;color:#ff7070;border-color:#5a2020}
@@ -214,7 +215,7 @@ textarea:focus{border-color:var(--blue);outline:none}
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Círculo = Repetidas</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Control Interactiva de Repes</div>
   </div>
   <div class="country-grid" id="country-grid"></div>
 </div>
@@ -353,11 +354,8 @@ const EMOJI={'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZ
 const MAX={'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
 
-// Estructuras de datos:
-// missing[p] = Array de números faltantes (únicos)
-// repeats[p] = Objeto { número: cantidad } para permitir duplicados reales de una misma figu
 let missing={},repeats={};
-let lastCrossedMatches = []; // Almacena temporalmente el último cruce exitoso
+let lastCrossedMatches = []; 
 
 function save(){try{localStorage.setItem('figus_m11_v2',JSON.stringify(missing));localStorage.setItem('figus_r11_v2',JSON.stringify(repeats));}catch(e){}}
 function load(){
@@ -376,7 +374,7 @@ function getHaveCount(p){
   const m=new Set(missing[p]||[]);
   let c=0;
   for(let i=1;i<=max;i++){
-    if(!m.has(i)) c++; // Si no falta, se asume que se tiene (al menos 1)
+    if(!m.has(i)) c++;
   }
   return c;
 }
@@ -524,7 +522,6 @@ function importSection(type){
   if(type==='missing'){
     Object.assign(missing,parsed);
   } else {
-    // Al ser sección simple, asumimos x1 por cada número listado
     for(const [p, nums] of Object.entries(parsed)){
       if(!repeats[p]) repeats[p]={};
       nums.forEach(n=>{ repeats[p][n] = (repeats[p][n]||0) + 1; });
@@ -537,20 +534,23 @@ function importSection(type){
 function renderAll(){renderCountries();updateStats();}
 
 function updateStats(){
-  let tm=0, tr=0, th=0;
+  let totalFaltantes=0, totalRepesAbsolutas=0, totalTengoUnicas=0;
+  
   for(const p of PAISES){
-    tm+=(missing[p]||[]).length;
-    tr+=getRepeatsCountTotal(p);
-    th+=getHaveCount(p);
+    totalFaltantes += (missing[p]||[]).length;
+    totalRepesAbsolutas += getRepeatsCountTotal(p);
+    totalTengoUnicas += getHaveCount(p);
   }
-  const total=TOTAL_FIGUS;
-  const pct=Math.round((th/total)*100);
-  document.getElementById('s-total').textContent=tm;
-  document.getElementById('s-repes').textContent=tr;
-  document.getElementById('s-pct').textContent=pct+'%';
-  document.getElementById('s-pct2').textContent=pct+'%';
-  document.getElementById('s-have-sub').textContent=th+' / '+total;
-  document.getElementById('progress-fill').style.width=pct+'%';
+  
+  const totalAlbum = TOTAL_FIGUS;
+  const pct = Math.round((totalTengoUnicas / totalAlbum) * 100);
+  
+  document.getElementById('s-total').textContent = totalFaltantes;
+  document.getElementById('s-repes').textContent = totalRepesAbsolutas; 
+  document.getElementById('s-pct').textContent = pct + '%';
+  document.getElementById('s-pct2').textContent = pct + '%';
+  document.getElementById('s-have-sub').textContent = totalTengoUnicas + ' / ' + totalAlbum;
+  document.getElementById('progress-fill').style.width = pct + '%';
 }
 
 function renderCountries(){
@@ -573,12 +573,60 @@ function renderCountries(){
     const card=document.createElement('div');
     card.className='country-card'+(m>0?' has-missing':' complete');
     
-    // Badge flotante azul de notificación si tiene repetidas reales
+    // CONTROL FLOTANTE INTERACTIVO DE REPETIDAS EN LA GRILLA PRINCIPAL
     if(totalRepes>0){
-      const rb=document.createElement('div');
-      rb.className='badge-repeats';
-      rb.textContent=totalRepes;
-      card.appendChild(rb);
+      const container=document.createElement('div');
+      container.className='badge-repeats-container collapsed';
+      
+      // Botón para restar cantidad total al país
+      const btnMinus=document.createElement('button');
+      btnMinus.className='badge-btn';
+      btnMinus.textContent='-';
+      btnMinus.style.display='none';
+      btnMinus.onclick=(e)=>{
+        e.stopPropagation(); // Evita que se abra el modal del país
+        alterCountryRepeatsCount(p, -1);
+      };
+      
+      const display=document.createElement('span');
+      display.className='badge-display';
+      display.textContent=totalRepes;
+      
+      // Botón para sumar cantidad total al país
+      const btnPlus=document.createElement('button');
+      btnPlus.className='badge-btn';
+      btnPlus.textContent='+';
+      btnPlus.style.display='none';
+      btnPlus.onclick=(e)=>{
+        e.stopPropagation();
+        alterCountryRepeatsCount(p, 1);
+      };
+      
+      // Al hacerle touch/click expande el control revelando el + y el -
+      container.onclick=(e)=>{
+        e.stopPropagation();
+        if(container.classList.contains('collapsed')){
+          container.classList.remove('collapsed');
+          container.classList.add('expanded');
+          btnMinus.style.display='flex';
+          btnPlus.style.display='flex';
+          
+          // Se colapsa de forma automática tras 3.5 segundos de inactividad
+          setTimeout(()=>{
+            if(container && container.classList.contains('expanded')){
+              container.classList.remove('expanded');
+              container.classList.add('collapsed');
+              btnMinus.style.display='none';
+              btnPlus.style.display='none';
+            }
+          }, 3500);
+        }
+      };
+      
+      container.appendChild(btnMinus);
+      container.appendChild(display);
+      container.appendChild(btnPlus);
+      card.appendChild(container);
     }
     
     const flagRow=document.createElement('div');flagRow.className='card-flag-row';
@@ -606,6 +654,33 @@ function renderCountries(){
   tw(grid);
 }
 
+// Modifica de forma masiva/rápida las repetidas desde la grilla principal
+function alterCountryRepeatsCount(p, val){
+  if(!repeats[p]) repeats[p]={};
+  
+  if(val > 0){
+    // Busca el primer nro de figu del país que ya sea repe para sumarle, o crea la primera en nro 1 si estuviese vacío
+    let keys=Object.keys(repeats[p]);
+    let targetNum = keys.length > 0 ? keys[0] : "1";
+    repeats[p][targetNum] = (repeats[p][targetNum]||0) + 1;
+  } else {
+    // Resta de las repes existentes del país hasta vaciar
+    let keys=Object.keys(repeats[p]);
+    if(keys.length > 0){
+      let targetNum = keys[0];
+      if(repeats[p][targetNum] > 1){
+        repeats[p][targetNum]--;
+      } else {
+        delete repeats[p][targetNum];
+      }
+    }
+  }
+  
+  save();
+  updateStats();
+  renderCountries();
+}
+
 let curPais='';
 function openModal(p){
   curPais=p;
@@ -628,7 +703,6 @@ function openModal(p){
       btn.className='num-btn missing-mark';
     } else if(cantRep>0){
       btn.className='num-btn repeat-mark';
-      // Badge interno con cantidad de repetidas (x2, x3, etc)
       const nb=document.createElement('div');
       nb.className='num-btn-badge';
       nb.textContent=cantRep;
@@ -637,9 +711,7 @@ function openModal(p){
       btn.className='num-btn have-mark';
     }
     
-    // Evento click normal maneja el flujo cíclico incremental
     btn.onclick=()=>cycleNum(p,i,btn);
-    // Contextmenu (clic derecho o mantener presionado en celu) permite resetear a "Tengo" directamente
     btn.oncontextmenu=(e)=>{ e.preventDefault(); resetToHave(p,i,btn); };
     
     grid.appendChild(btn);
@@ -656,31 +728,25 @@ function cycleNum(p,n,btn){
   const inM=missing[p].includes(n);
   const cantRep=repeats[p][n]||0;
   
-  // Eliminar cualquier badge interno viejo antes de renderizar el nuevo estado
   const oldBadge=btn.querySelector('.num-btn-badge');
   if(oldBadge) oldBadge.remove();
   
-  // Flujo cíclico inteligente:
-  // 1. Tengo -> Pasa a Falta
   if(!inM && cantRep===0){
     missing[p].push(n);
     missing[p].sort((a,b)=>a-b);
     btn.className='num-btn missing-mark';
   }
-  // 2. Falta -> Pasa a Repetida x1
   else if(inM){
     missing[p]=missing[p].filter(x=>x!==n);
     repeats[p][n]=1;
     btn.className='num-btn repeat-mark';
     const nb=document.createElement('div');nb.className='num-btn-badge';nb.textContent=1;btn.appendChild(nb);
   }
-  // 3. Repetida -> Incrementa infinitamente (x2, x3, x4...)
   else if(cantRep>0 && cantRep < 4){
     repeats[p][n] = cantRep + 1;
     btn.className='num-btn repeat-mark';
     const nb=document.createElement('div');nb.className='num-btn-badge';nb.textContent=repeats[p][n];btn.appendChild(nb);
   }
-  // 4. Si ya tiene 4 repes y vuelve a tocar, vuelve al inicio (Tengo) para cerrar el ciclo
   else {
     delete repeats[p][n];
     btn.className='num-btn have-mark';
@@ -758,7 +824,6 @@ function syncCrossedFigus(){
   let contador = 0;
   lastCrossedMatches.forEach(item => {
     if(missing[item.pais] && missing[item.pais].includes(item.numero)){
-      // La removemos de faltantes -> Automáticamente pasa al estado "Tengo"
       missing[item.pais] = missing[item.pais].filter(x => x !== item.numero);
       contador++;
     }
@@ -793,11 +858,9 @@ function copyCross(){
 
 function openWA(text){window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');}
 
-// CARGA INICIAL DE DATOS DEMO SINO HAY NADA
 load();
 if(!Object.keys(missing).length && !Object.keys(repeats).length){
   missing={"FWC":[1,2,6,7,8,9,10,13,17,19],"MEX":[6,11],"RSA":[3,10,11,15,16,19],"KOR":[3,11,15,16,19],"ARG":[1,2,3,4,10]};
-  // Formato nuevo de repetidas soportando multiplicidad real:
   repeats={"FWC":{"11":1},"KOR":{"4":2,"8":1,"12":3},"CAN":{"3":1,"7":2},"ARG":{"8":3}};
   save();
 }
