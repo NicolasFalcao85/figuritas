@@ -170,7 +170,10 @@ textarea:focus{border-color:var(--blue);outline:none}
       <div class="header-sub" id="header-user-sub">COMUNIDAD ONLINE</div>
     </div>
   </div>
-  <button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="logout()"><i class="ti ti-logout"></i> Salir</button>
+  <div style="display:flex;align-items:center;gap:6px">
+    <button class="btn btn-primary" style="padding:4px 8px;font-size:11px;background:rgba(255,255,255,0.15);border:none" onclick="triggerManualStatsSync()" title="Recalcular KPIs"><i class="ti ti-refresh"></i> Actualizar</button>
+    <button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="logout()"><i class="ti ti-logout"></i> Salir</button>
+  </div>
 </div>
 <div class="gold-bar"></div>
 
@@ -276,7 +279,7 @@ textarea:focus{border-color:var(--blue);outline:none}
       <button class="btn" onclick="importFull('missing')" style="font-size:12px">Solo faltan</button>
       <button class="btn" onclick="importFull('repeats')" style="font-size:12px">Solo repes</button>
     </div>
-    <div id="import-full-status" style="margin-top:8px; font-weight:bold;"></div>
+    <div id="import-full-status" style="margin-top:12px; padding:10px; border-radius:8px; font-weight:600; display:none;"></div>
   </div>
 </div>
 
@@ -348,7 +351,7 @@ let curPreview = 'missing';
 const TOTAL_FIGUS = 994;
 const PAISES = ['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
 const NAMES = {'FWC':'FIFA WC','MEX':'México','RSA':'Sudáfrica','KOR':'Corea del Sur','CZE':'Rep. Checa','CAN':'Canadá','BIH':'Bosnia','QAT':'Qatar','SUI':'Suiza','BRA':'Brasil','MAR':'Marruecos','HAI':'Haití','SCO':'Escocia','USA':'EE.UU.','PAR':'Paraguay','AUS':'Australia','TUR':'Turquía','GER':'Alemania','CUW':'Curazao','CIV':'Costa de Marfil','ECU':'Ecuador','NED':'P. Bajos','JPN':'Japón','SWE':'Suecia','TUN':'Túnez','BEL':'Bélgica','EGY':'Egipto','IRN':'Irán','NZL':'Nueva Zelanda','ESP':'España','CPV':'Cabo Verde','KSA':'Arabia Saudita','URU':'Uruguay','FRA':'Francia','SEN':'Senegal','IRQ':'Irak','NOR':'Noruega','ARG':'Argentina','ALG':'Argelia','AUT':'Austria','JOR':'Jordania','POR':'Portugal','COD':'Congo DR','UZB':'Uzbekistán','COL':'Colombia','ENG':'Inglaterra','CRO':'Croacia','GHA':'Ghana','PAN':'Panamá','CC':'Coca-Cola'};
-const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
+const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴\u200D󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
 const MAX = {'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
 
@@ -360,35 +363,42 @@ window.loginWithGoogle = async function() {
 
 window.logout = function() { signOut(auth); }
 
-// LOGICA ASINCRÓNICA MEJORADA: Cuando baja la info de internet, fuerza el render y recalcula KPIs al toque
 onAuthStateChanged(auth, async (user) => {
   if(user) {
     currentUser = user;
     document.getElementById('auth-screen').style.display = 'none';
-    const userRef = doc(db, "users", user.uid);
-    const userDoc = await getDoc(userRef);
-    
-    if (userDoc.exists()) {
-      const data = userDoc.data();
-      missing = data.missing || {};
-      repeats = data.repeats || {};
-      document.getElementById('header-user-sub').textContent = `HOLA, ${(data.name || "AMIGO").toUpperCase()}!`;
-    } else {
-      const initialMissing = {};
-      PAISES.forEach(p => { initialMissing[p] = []; for(let i=1; i<=getMax(p); i++) initialMissing[p].push(i); });
-      missing = initialMissing; repeats = {};
-      await setDoc(userRef, { name: user.displayName || "Amigo", email: user.email, missing: missing, repeats: repeats });
-      document.getElementById('header-user-sub').textContent = `HOLA, ${(user.displayName || "AMIGO").toUpperCase()}!`;
-    }
-    
-    // FIX DE SINCRONIZACIÓN: Redibuja y calcula sobre los datos bajados en caliente
-    renderAll(); 
+    await pullUserDataAndForceSync(); 
     listenCommunityChannels();
   } else {
     currentUser = null;
     document.getElementById('auth-screen').style.display = 'flex';
   }
 });
+
+async function pullUserDataAndForceSync() {
+  if(!currentUser) return;
+  const userRef = doc(db, "users", currentUser.uid);
+  const userDoc = await getDoc(userRef);
+  
+  if (userDoc.exists()) {
+    const data = userDoc.data();
+    missing = data.missing || {};
+    repeats = data.repeats || {};
+    document.getElementById('header-user-sub').textContent = `HOLA, ${(data.name || "AMIGO").toUpperCase()}!`;
+  } else {
+    const initialMissing = {};
+    PAISES.forEach(p => { initialMissing[p] = []; for(let i=1; i<=getMax(p); i++) initialMissing[p].push(i); });
+    missing = initialMissing; repeats = {};
+    await setDoc(userRef, { name: currentUser.displayName || "Amigo", email: currentUser.email, missing: missing, repeats: repeats });
+    document.getElementById('header-user-sub').textContent = `HOLA, ${(currentUser.displayName || "AMIGO").toUpperCase()}!`;
+  }
+  renderAll(); 
+}
+
+window.triggerManualStatsSync = async function() {
+  showToast("🔄 Sincronizando con la nube...");
+  await pullUserDataAndForceSync();
+}
 
 async function syncToCloud() {
   if(!currentUser) return;
@@ -494,6 +504,7 @@ function parseFullExport(text){
   return {missing:mis,repeats:rep};
 }
 
+// RESTAURADO: El importador masivo con alerta de éxito y resumen de conteo real
 window.importFull = function(modeSelect) {
   const text = document.getElementById('import-full').value;
   const parsed = parseFullExport(text);
@@ -502,10 +513,22 @@ window.importFull = function(modeSelect) {
   let mk = Object.keys(parsed.missing).length;
   let rk = Object.keys(parsed.repeats).length;
   
-  if(!mk && !rk) { status.textContent = "No se detectaron datos válidos."; status.style.color = "var(--red)"; return; }
+  if(!mk && !rk) { 
+    status.style.display = "block";
+    status.style.background = "#fff0f0";
+    status.style.color = "var(--red)";
+    status.textContent = "❌ No se encontraron datos válidos. Copiá el texto completo de la app."; 
+    return; 
+  }
   
+  let countFaltantesCargadas = 0;
+  let countRepesCargadas = 0;
+
   if(modeSelect === 'both' || modeSelect === 'missing') {
-    if(mk) missing = parsed.missing;
+    if(mk) {
+      missing = parsed.missing;
+      Object.values(missing).forEach(arr => countFaltantesCargadas += arr.length);
+    }
   }
   if(modeSelect === 'both' || modeSelect === 'repeats') {
     if(rk) {
@@ -517,14 +540,22 @@ window.importFull = function(modeSelect) {
           const num = parseInt(numStr);
           missing[p] = missing[p].filter(x => x !== num);
         });
+        Object.values(obj).forEach(cant => countRepesCargadas += cant);
       }
     }
   }
   
-  syncToCloud(); renderAll();
-  status.textContent = "✓ ¡Álbum importado y subido a tu cuenta!";
+  syncToCloud(); 
+  renderAll();
+  
+  // Mostrar cuadro informativo de éxito
+  status.style.display = "block";
+  status.style.background = "#f0fff4";
   status.style.color = "#1a7a3c";
-  showToast("¡Datos Sincronizados!");
+  status.style.border = "1.5px solid #81c784";
+  status.innerHTML = `✓ ¡Álbum cargado correctamente!<br><span style="font-size: 12px; font-weight: normal; opacity: 0.85;">Se detectaron e importaron <b>${countFaltantesCargadas}</b> faltantes y <b>${countRepesCargadas}</b> repetidas. Los datos ya están respaldados en tu cuenta.</span>`;
+  
+  showToast("¡DATOS SINCRONIZADOS EN LA NUBE!");
 }
 
 window.doCross = function() {
@@ -551,7 +582,6 @@ window.clearCross = function() {
   document.getElementById('cross-count').textContent='—'; document.getElementById('sync-cross-btn').style.display='none';
 }
 
-// ARREGLADO: El contador matemático puro del álbum
 function getHaveCount(p){
   const max = getMax(p);
   const mArr = missing[p] || [];
@@ -625,17 +655,12 @@ function openModal(p){
   renderModalNumbers(); document.getElementById('modal-bg').classList.add('open');
 }
 
-// CORREGIDO: Los clics individuales ahora impactan directo sobre las listas correctas de negocio y fuerzan recalculación de KPIs
 function renderModalNumbers() {
-  const p = curPais; 
-  if(!missing[p]) missing[p] = [];
-  if(!repeats[p]) repeats[p] = {};
-  
+  const p = curPais; const repObj = repeats[p]||{};
   const grid = document.getElementById('modal-nums'); grid.innerHTML = '';
   
   for(let i=1; i<=getMax(p); i++){
-    const inM = missing[p].includes(i); 
-    const cantRep = repeats[p][i]||0; 
+    const inM = missing[p]?.includes(i); const cantRep = repObj[i]||0; 
     const btn = document.createElement('button'); btn.textContent = i;
     
     if(inM){ btn.className = 'num-btn missing-mark'; } 
@@ -644,37 +669,39 @@ function renderModalNumbers() {
       const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = cantRep; btn.appendChild(nb);
     } else { btn.className = 'num-btn have-mark'; }
     
-    // CLICK NORMAL: Falta -> Tengo -> Repe x1 -> Repe x2 -> ...
     btn.onclick = () => {
+      if(!missing[p]) missing[p] = [];
+      if(!repeats[p]) repeats[p] = {};
+      
       if(missing[p].includes(i)) { 
-        missing[p] = missing[p].filter(x => x !== i); // Pasa a Tengo (Limpio)
+        missing[p] = missing[p].filter(x => x !== i); 
       }
       else if(cantRep === 0) { 
-        repeats[p][i] = 1; // Pasa a Repe x1
+        repeats[p][i] = 1; 
       }
       else { 
-        repeats[p][i]++; // Incrementa Repes
+        repeats[p][i]++; 
       }
       renderModalNumbers(); 
-      updateStats(); // Fuerza recálculo inmediato de los KPIs en el panel superior
+      updateStats(); 
       syncToCloud(); 
     };
     
-    // CLICK DERECHO / LONG PRESS: Restar repes o mandar a falta
     btn.oncontextmenu = (e) => {
       e.preventDefault();
-      const currentRepCount = repeats[p][i]||0;
+      if(!missing[p]) missing[p] = [];
+      if(!repeats[p]) repeats[p] = {};
 
-      if(currentRepCount > 1) { 
+      if(cantRep > 1) { 
         repeats[p][i]--; 
-      } else if(currentRepCount === 1) { 
-        delete repeats[p][i]; // Vuelve a Tengo (Limpio)
+      } else if(cantRep === 1) { 
+        delete repeats[p][i]; 
       }
       else if(!missing[p].includes(i)) { 
-        missing[p].push(i); missing[p].sort((a,b)=>a-b); // Vuelve a Falta
+        missing[p].push(i); missing[p].sort((a,b)=>a-b); 
       }
       renderModalNumbers(); 
-      updateStats(); // Fuerza recálculo inmediato de los KPIs en el panel superior
+      updateStats(); 
       syncToCloud(); 
     };
     grid.appendChild(btn);
@@ -688,6 +715,12 @@ window.showTab = function(t) {
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
   if(t==='album') renderCountries(); if(t==='share') setPreview(curPreview);
+  
+  // Limpia el estado de importación al cambiar de pestaña para que no quede viejo
+  if(t!=='import') {
+    const s = document.getElementById('import-full-status');
+    if(s) s.style.display = "none";
+  }
 }
 
 window.setPreview = function(t) { curPreview = t; document.getElementById('share-preview-box').textContent = buildText(t); document.getElementById('pt-missing').classList.toggle('active', t==='missing'); document.getElementById('pt-repeats').classList.toggle('active', t==='repeats'); }
