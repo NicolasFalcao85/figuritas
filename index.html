@@ -154,7 +154,6 @@ textarea:focus{border-color:var(--blue);outline:none}
       <h3 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-top:12px">Álbum del Mundial 2026</h3>
       <p style="color:var(--text2);font-size:13px;margin-top:4px">Ingresá para ver las repes y faltantes de tus amigos en tiempo real.</p>
     </div>
-    
     <button class="btn btn-google btn-block" onclick="loginWithGoogle()">
       <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.8 2.71v2.24h2.92c1.71-1.58 2.68-3.9 2.68-6.58z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.24c-.8.54-1.84.87-3.04.87-2.34 0-4.33-1.58-5.03-3.71H.95v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.74c-.18-.54-.28-1.12-.28-1.74s.1-1.2.28-1.74V4.96H.95A8.99 8.99 0 0 0 0 9c0 1.46.35 2.85.95 4.09l3.02-2.35z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.3A8.99 8.99 0 0 0 9 0 9 9 0 0 0 .95 4.96l3.02 2.35c.7-2.13 2.69-3.73 5.03-3.73z"/></svg>
       Iniciar Sesión con Google
@@ -178,8 +177,8 @@ textarea:focus{border-color:var(--blue);outline:none}
 <div class="tabs">
   <button class="tab active" onclick="showTab('album')">Album</button>
   <button class="tab" onclick="showTab('comu')">Comunidad</button>
-  <button class="tab" onclick="showTab('cross')">Cruzar / Importar</button>
-  <button class="tab" onclick="showTab('share')">Compartir</button>
+  <button class="tab" onclick="showTab('cross')">Cruzar</button>
+  <button class="tab" onclick="showTab('import')">Importar</button>
 </div>
 
 <div class="content">
@@ -244,37 +243,43 @@ textarea:focus{border-color:var(--blue);outline:none}
 
 <div id="tab-cross" class="section">
   <div class="panel">
-    <div class="panel-title">Panel de Carga masiva / Cruce Manual</div>
-    <p style="font-size:11px;color:var(--text2);margin-bottom:8px">Pegá tu lista de WhatsApp acá. Sirve tanto para cruzar la lista de un amigo como para hacer una <b>Importación completa de tus faltantes</b> si querés cargar tu álbum de cero.</p>
-    <textarea id="cross-input" placeholder="Pegá el bloque de texto de WhatsApp acá...&#10;Ejemplo:&#10;ARG: 1, 2, 5, 10&#10;BRA: 4, 18, 20"></textarea>
+    <div class="panel-title">Me ofrecen</div>
+    <div class="tip" style="margin-bottom:8px">Pegá la lista de repetidas de otra persona para ver cuáles te sirven.</div>
+    <textarea id="cross-input" placeholder="Repetidas&#10;FWC: 11&#10;KOR: 4, 8"></textarea>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="doCross()"><i class="ti ti-arrows-cross"></i> Procesar Texto</button>
+      <button class="btn btn-primary" onclick="doCross()"><i class="ti ti-search"></i> Cruzar</button>
       <button class="btn" onclick="clearCross()"><i class="ti ti-trash"></i> Limpiar</button>
     </div>
   </div>
-  
   <div class="panel">
-    <div class="panel-title">Resultado del análisis</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--blue);margin-bottom:6px" id="cross-count">0 figuritas detectadas</div>
-    <div class="result-box" id="cross-result" style="margin-bottom:12px">—</div>
-    
-    <div class="btn-row" style="gap:10px">
-      <button class="btn btn-success" onclick="syncCrossedFigus()" id="sync-cross-btn" style="display:none; flex:1">
-        <i class="ti ti-download"></i> Marcar como Conseguidas
-      </button>
-      
-      <button class="btn btn-danger" onclick="overwriteMyMissingAlbum()" id="import-overwrite-btn" style="display:none; flex:1">
-        <i class="ti ti-file-import"></i> Forzar como mis Faltantes
-      </button>
+    <div class="panel-title">Las que te sirven</div>
+    <div class="result-box" id="cross-result">—</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--blue);margin:8px 0" id="cross-count">—</div>
+    <div class="btn-row">
+      <button class="btn btn-success" onclick="syncCrossedFigus()" id="sync-cross-btn" style="display:none"><i class="ti ti-download"></i> Sincronizar a mi Álbum</button>
     </div>
+  </div>
+</div>
+
+<div id="tab-import" class="section">
+  <div class="panel">
+    <div class="panel-title">Formato completo de la app</div>
+    <div class="tip" style="margin-bottom:8px">Pegá todo el bloque de texto con las secciones "Me faltan" y "Repetidas".</div>
+    <textarea id="import-full" style="min-height:150px" placeholder="Figuritas App - Lista&#10;Me faltan&#10;FWC 🏆: 1, 2&#10;...&#10;Repetidas&#10;FWC 📜: 11"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="importFull('both')"><i class="ti ti-check"></i> Cargar todo</button>
+      <button class="btn" onclick="importFull('missing')" style="font-size:12px">Solo faltan</button>
+      <button class="btn" onclick="importFull('repeats')" style="font-size:12px">Solo repes</button>
+    </div>
+    <div id="import-full-status" style="margin-top:8px; font-weight:bold;"></div>
   </div>
 </div>
 
 <div id="tab-share" class="section">
   <div class="share-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;" onclick="shareAll('missing')">❌ Copiar Faltantes</div>
-    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;" onclick="shareAll('repeats')">🔄 Copiar Repes</div>
-    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;border-color:var(--gold)" onclick="shareAll('both')">📋 Copiar Todo</div>
+    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;" onclick="shareAll('missing')">❌ Faltantes</div>
+    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;" onclick="shareAll('repeats')">🔄 Repes</div>
+    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;border-color:var(--gold)" onclick="shareAll('both')">📋 Todo</div>
   </div>
   <div class="panel">
     <div class="panel-title">Vista previa de tus listas de texto</div>
@@ -329,22 +334,19 @@ let missing = {};
 let repeats = {};
 let globalUsersDatabase = {};
 let lastCrossedMatches = [];
-let lastParsedResultRaw = {}; 
 let curPreview = 'missing';
 
 const TOTAL_FIGUS = 994;
 const PAISES = ['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
 const NAMES = {'FWC':'FIFA WC','MEX':'México','RSA':'Sudáfrica','KOR':'Corea del Sur','CZE':'Rep. Checa','CAN':'Canadá','BIH':'Bosnia','QAT':'Qatar','SUI':'Suiza','BRA':'Brasil','MAR':'Marruecos','HAI':'Haití','SCO':'Escocia','USA':'EE.UU.','PAR':'Paraguay','AUS':'Australia','TUR':'Turquía','GER':'Alemania','CUW':'Curazao','CIV':'Costa de Marfil','ECU':'Ecuador','NED':'P. Bajos','JPN':'Japón','SWE':'Suecia','TUN':'Túnez','BEL':'Bélgica','EGY':'Egipto','IRN':'Irán','NZL':'Nueva Zelanda','ESP':'España','CPV':'Cabo Verde','KSA':'Arabia Saudita','URU':'Uruguay','FRA':'Francia','SEN':'Senegal','IRQ':'Irak','NOR':'Noruega','ARG':'Argentina','ALG':'Argelia','AUT':'Austria','JOR':'Jordania','POR':'Portugal','COD':'Congo DR','UZB':'Uzbekistán','COL':'Colombia','ENG':'Inglaterra','CRO':'Croacia','GHA':'Ghana','PAN':'Panamá','CC':'Coca-Cola'};
-const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴\u200D󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
+const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴\u200D󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'JJapón','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
 const MAX = {'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
 
 window.loginWithGoogle = async function() {
   const errDiv = document.getElementById('auth-error');
   errDiv.textContent = "";
-  try {
-    await signInWithPopup(auth, provider);
-  } catch (e) { errDiv.textContent = "Error al conectar con Google: " + e.message; }
+  try { await signInWithPopup(auth, provider); } catch (e) { errDiv.textContent = "Error al conectar: " + e.message; }
 }
 
 window.logout = function() { signOut(auth); }
@@ -353,7 +355,6 @@ onAuthStateChanged(auth, async (user) => {
   if(user) {
     currentUser = user;
     document.getElementById('auth-screen').style.display = 'none';
-    
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
     
@@ -363,24 +364,13 @@ onAuthStateChanged(auth, async (user) => {
       repeats = data.repeats || {};
       document.getElementById('header-user-sub').textContent = `HOLA, ${(data.name || "AMIGO").toUpperCase()}!`;
     } else {
-      // Setup inicial limpio
       const initialMissing = {};
-      PAISES.forEach(p => {
-        initialMissing[p] = [];
-        for(let i=1; i<=getMax(p); i++) initialMissing[p].push(i);
-      });
-      missing = initialMissing;
-      repeats = {};
-      await setDoc(userRef, {
-        name: user.displayName || "Amigo",
-        email: user.email,
-        missing: missing,
-        repeats: repeats
-      });
+      PAISES.forEach(p => { initialMissing[p] = []; for(let i=1; i<=getMax(p); i++) initialMissing[p].push(i); });
+      missing = initialMissing; repeats = {};
+      await setDoc(userRef, { name: user.displayName || "Amigo", email: user.email, missing: missing, repeats: repeats });
       document.getElementById('header-user-sub').textContent = `HOLA, ${(user.displayName || "AMIGO").toUpperCase()}!`;
     }
-    renderAll();
-    listenCommunityChannels();
+    renderAll(); listenCommunityChannels();
   } else {
     currentUser = null;
     document.getElementById('auth-screen').style.display = 'flex';
@@ -389,23 +379,15 @@ onAuthStateChanged(auth, async (user) => {
 
 async function syncToCloud() {
   if(!currentUser) return;
-  try {
-    await setDoc(doc(db, "users", currentUser.uid), {
-      missing: missing,
-      repeats: repeats
-    }, { merge: true });
-  } catch(e) { console.error("Error al sincronizar:", e); }
+  try { await setDoc(doc(db, "users", currentUser.uid), { missing: missing, repeats: repeats }, { merge: true }); } catch(e) { console.error(e); }
 }
 
 function listenCommunityChannels() {
   onSnapshot(collection(db, "users"), (snapshot) => {
     const listDiv = document.getElementById('community-users-list');
-    listDiv.innerHTML = "";
-    globalUsersDatabase = {};
+    listDiv.innerHTML = ""; globalUsersDatabase = {};
     snapshot.forEach(docSnap => {
-      const id = docSnap.id;
-      const uData = docSnap.data();
-      globalUsersDatabase[id] = uData;
+      const id = docSnap.id; const uData = docSnap.data(); globalUsersDatabase[id] = uData;
       if(currentUser && id === currentUser.uid) return;
       
       let coreHave = 0;
@@ -417,13 +399,7 @@ function listenCommunityChannels() {
 
       const row = document.createElement('div');
       row.className = 'user-row-card';
-      row.innerHTML = `
-        <div>
-          <div class="user-info-name">${uData.name || "Amigo anónimo"}</div>
-          <div class="user-info-pct">Progreso: ${pct}%</div>
-        </div>
-        <button class="btn btn-primary" style="padding:6px 12px; font-size:12px;"><i class="ti ti-arrows-cross"></i> Ver Cruce</button>
-      `;
+      row.innerHTML = `<div><div class="user-info-name">${uData.name || "Amigo"}</div><div class="user-info-pct">Progreso: ${pct}%</div></div><button class="btn btn-primary" style="padding:6px 12px; font-size:12px;"><i class="ti ti-arrows-cross"></i> Ver Cruce</button>`;
       row.querySelector('button').onclick = () => calculateLiveCrossDeal(id);
       listDiv.appendChild(row);
     });
@@ -432,41 +408,30 @@ function listenCommunityChannels() {
 }
 
 function calculateLiveCrossDeal(friendId) {
-  const friend = globalUsersDatabase[friendId];
-  if(!friend) return;
-  const youGiveMatches = [];
-  const heGivesMatches = [];
+  const friend = globalUsersDatabase[friendId]; if(!friend) return;
+  const youGiveMatches = []; const heGivesMatches = [];
 
   for(const [p, repObj] of Object.entries(friend.repeats || {})) {
     const myM = missing[p] || [];
-    Object.keys(repObj).forEach(nStr => {
-      const n = parseInt(nStr);
-      if(myM.includes(n) && repObj[nStr] > 0) heGivesMatches.push(`${p}${n}`);
-    });
+    Object.keys(repObj).forEach(nStr => { if(myM.includes(parseInt(nStr)) && repObj[nStr] > 0) heGivesMatches.push(`${p}${nStr}`); });
   }
   for(const [p, repObj] of Object.entries(repeats)) {
     const friendM = friend.missing?.[p] || [];
-    Object.keys(repObj).forEach(nStr => {
-      const n = parseInt(nStr);
-      if(friendM.includes(n) && repObj[nStr] > 0) youGiveMatches.push(`${p}${n}`);
-    });
+    Object.keys(repObj).forEach(nStr => { if(friendM.includes(parseInt(nStr)) && repObj[nStr] > 0) youGiveMatches.push(`${p}${nStr}`); });
   }
   document.getElementById('panel-deal-result').style.display = 'block';
   document.getElementById('deal-title').textContent = `Intercambio óptimo con ${friend.name}`;
-  const hgBox = document.getElementById('deal-he-gives');
-  const ygBox = document.getElementById('deal-you-give');
+  const hgBox = document.getElementById('deal-he-gives'); const ygBox = document.getElementById('deal-you-give');
   hgBox.textContent = heGivesMatches.length > 0 ? heGivesMatches.join(', ') : "Ninguna :(";
   ygBox.textContent = youGiveMatches.length > 0 ? youGiveMatches.join(', ') : "Ninguna :(";
 
-  const waBtn = document.getElementById('deal-wa-btn');
-  waBtn.onclick = () => {
+  document.getElementById('deal-wa-btn').onclick = () => {
     const text = `⚽ *¡Hola ${friend.name}! Cruzando nuestro panel de figus vi que podemos cambiar:* \n\n➕ *Me das:* ${hgBox.textContent}\n➖ *Te doy:* ${ygBox.textContent}\n\n¿Cambiamos? 🤝`;
     window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
   };
-  document.getElementById('panel-deal-result').scrollIntoView({ behavior: 'smooth' });
 }
 
-// PARSEADOR MEJORADO
+// PARSEADORES HISTORICOS ORIGINALES RESTAURADOS
 function parseText(text){
   const result={};
   for(const raw of text.split('\n')){
@@ -474,8 +439,7 @@ function parseText(text){
     if(!line||/^(figuritas app|usa méx|me faltan|repetidas|descarga|https?:)/i.test(line))continue;
     const hm=line.match(/^#([A-Z]{2,4})(\d+)/i);
     if(hm){
-      const p=hm[1].toUpperCase(),n=parseInt(hm[2]);
-      if(PAISES.includes(p)&&n>0){if(!result[p])result[p]=[];result[p].push(n);}
+      const p=hm[1].toUpperCase(),n=parseInt(hm[2]); if(PAISES.includes(p)&&n>0){if(!result[p])result[p]=[];result[p].push(n);}
       continue;
     }
     const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d]/g,' ').trim();
@@ -491,84 +455,85 @@ function parseText(text){
   return result;
 }
 
-window.doCross = function() {
-  const textVal = document.getElementById('cross-input').value;
-  const offered = parseText(textVal);
-  lastParsedResultRaw = offered; 
-  lastCrossedMatches = [];
+function parseFullExport(text){
+  let mode=null; const mis={}, rep={};
+  for(const raw of text.split('\n')){
+    const line=raw.trim();if(!line)continue;
+    if(/me faltan/i.test(line)){mode='missing';continue;}
+    if(/^repetidas/i.test(line)){mode='repeats';continue;}
+    if(/^(figuritas app|usa méx|descarga|https?:)/i.test(line)){mode=null;continue;}
+    if(!mode)continue;
+    const hm=line.match(/^#([A-Z]{2,4})(\d+)/i);
+    if(hm){
+      const p=hm[1].toUpperCase(),n=parseInt(hm[2]);
+      if(PAISES.includes(p)&&n>0){ if(mode==='missing'){ if(!mis[p])mis[p]=[]; mis[p].push(n); } else { if(!rep[p])rep[p]={}; rep[p][n]=(rep[p][n]||0)+1; } }
+      continue;
+    }
+    const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d]/g,' ').trim();
+    const m=s.match(/^([A-Z]{2,4})\b[^:]*:\s*([\d,\s]+)/i);
+    if(m){
+      const p=m[1].toUpperCase();
+      if(PAISES.includes(p)){
+        const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
+        if(nums.length){ if(mode==='missing'){ if(!mis[p])mis[p]=[]; mis[p]=[...new Set([...mis[p],...nums])].sort((a,b)=>a-b); } else { if(!rep[p])rep[p]={}; nums.forEach(n=>{rep[p][n]=(rep[p][n]||0)+1;}); } }
+      }
+    }
+  }
+  return {missing:mis,repeats:rep};
+}
+
+// LOGICA DE RECONEXION DE LOS BOTONES DE LA PESTAÑA IMPORTAR DIRECTO A LA NUBE
+window.importFull = function(modeSelect) {
+  const text = document.getElementById('import-full').value;
+  const parsed = parseFullExport(text);
+  const status = document.getElementById('import-full-status');
   
-  let totalDetectadas = 0;
+  let mk = Object.keys(parsed.missing).length;
+  let rk = Object.keys(parsed.repeats).length;
+  
+  if(!mk && !rk) { status.textContent = "No se detectaron datos válidos."; status.style.color = "var(--red)"; return; }
+  
+  if(modeSelect === 'both' || modeSelect === 'missing') {
+    if(mk) missing = parsed.missing;
+  }
+  if(modeSelect === 'both' || modeSelect === 'repeats') {
+    if(rk) {
+      repeats = {}; // Limpia e importa lote nuevo físico
+      for(const [p,obj] of Object.entries(parsed.repeats)) { repeats[p] = obj; }
+    }
+  }
+  
+  syncToCloud(); renderAll();
+  status.textContent = "✓ ¡Álbum importado y subido a tu cuenta!";
+  status.style.color = "#1a7a3c";
+  showToast("¡Datos Sincronizados!");
+}
+
+window.doCross = function() {
+  const offered = parseText(document.getElementById('cross-input').value);
+  lastCrossedMatches = [];
   for(const [p,nums] of Object.entries(offered)){
-    totalDetectadas += nums.length;
     const myM = missing[p]||[];
     for(const n of nums) if(myM.includes(n)) lastCrossedMatches.push({pais:p, numero:n});
   }
-  
-  document.getElementById('cross-count').textContent = `${totalDetectadas} figuritas procesadas`;
   const res = document.getElementById('cross-result');
-  
-  if(totalDetectadas === 0) {
-    res.textContent = 'No se detectó ningún formato válido. Asegurate de que empiece con el código (ej: ARG: 1, 2, 3)';
-    document.getElementById('sync-cross-btn').style.display='none';
-    document.getElementById('import-overwrite-btn').style.display='none';
-    return;
-  }
-
-  // Si detectó datos, habilita opciones
-  res.innerHTML = `<b>Lista interpretada:</b><br>` + Object.entries(offered).map(([p,nums])=>`<b>${p}:</b> ${nums.join(', ')}`).join('<br>');
-  
-  // Mostrar botón de cruce si coinciden con tus faltantes actuales
-  if(lastCrossedMatches.length > 0) {
-    document.getElementById('sync-cross-btn').style.display='inline-flex';
-    document.getElementById('sync-cross-btn').innerHTML = `<i class="ti ti-download"></i> Conseguí ${lastCrossedMatches.length} de esta lista`;
-  } else {
-    document.getElementById('sync-cross-btn').style.display='none';
-  }
-  
-  // Siempre habilitar el botón de Importación Completa (Sobrescribir tus faltantes)
-  document.getElementById('import-overwrite-btn').style.display='inline-flex';
-}
-
-// IMPORTANTE: FUNCIÓN DE IMPORTACIÓN PARA CARGAR TU ÁLBUM
-window.overwriteMyMissingAlbum = function() {
-  if(Object.keys(lastParsedResultRaw).length === 0) return;
-  if(!confirm("⚠️ ¿Estás seguro de que querés configurar esta lista como TUS PROPIAS FALTANTES? Esto reemplazará tu configuración actual en el sistema.")) return;
-  
-  // Inicializamos todo vacío y solo guardamos lo que se parseó
-  const newMissing = {};
-  PAISES.forEach(p => {
-    newMissing[p] = lastParsedResultRaw[p] || []; // Guarda las que faltan pasadas por texto, si no vino ninguna queda en 0
-  });
-  
-  missing = newMissing;
-  syncToCloud();
-  renderAll();
-  showToast("¡Álbum cargado e importado!");
-  clearCross();
+  document.getElementById('cross-count').textContent = lastCrossedMatches.length + ' figuritas coinciden';
+  if(!lastCrossedMatches.length) { res.textContent = 'Ninguna coincide :('; document.getElementById('sync-cross-btn').style.display='none'; return; }
+  res.textContent = lastCrossedMatches.map(m=>`${m.pais}${m.numero}`).join(', ');
+  document.getElementById('sync-cross-btn').style.display='inline-flex';
 }
 
 window.syncCrossedFigus = function() {
-  lastCrossedMatches.forEach(item => {
-    if(missing[item.pais]) missing[item.pais] = missing[item.pais].filter(x => x !== item.numero);
-  });
+  lastCrossedMatches.forEach(item => { if(missing[item.pais]) missing[item.pais] = missing[item.pais].filter(x => x !== item.numero); });
   syncToCloud(); renderAll(); showToast("¡Sincronizadas al álbum!"); clearCross();
 }
 
 window.clearCross = function() {
   document.getElementById('cross-input').value=''; document.getElementById('cross-result').textContent='—';
-  document.getElementById('cross-count').textContent='0 figuritas detectadas'; 
-  document.getElementById('sync-cross-btn').style.display='none';
-  document.getElementById('import-overwrite-btn').style.display='none';
+  document.getElementById('cross-count').textContent='—'; document.getElementById('sync-cross-btn').style.display='none';
 }
 
-// RENDER Y LOGICA VISUAL
-function getHaveCount(p){
-  const mSet = new Set(missing[p]||[]);
-  let count = 0;
-  for(let i=1; i<=getMax(p); i++) if(!mSet.has(i)) count++;
-  return count;
-}
-
+// ENGINE VISUAL DE CASILLEROS
 function updateStats(){
   let totalFaltantes=0, totalRepesAbsolutas=0, totalTengoUnicas=0;
   for(const p of PAISES){
@@ -588,28 +553,22 @@ function updateStats(){
 window.renderCountries = function() {
   const filter = document.getElementById('filter-mode').value;
   const search = document.getElementById('search-country').value.toUpperCase();
-  const grid = document.getElementById('country-grid');
-  grid.innerHTML = '';
+  const grid = document.getElementById('country-grid'); grid.innerHTML = '';
   const frag = document.createDocumentFragment();
   
   for(const p of PAISES){
     if(search && !p.includes(search) && !NAMES[p].toUpperCase().includes(search)) continue;
     const m = (missing[p]||[]).length;
-    let totalRepes = 0;
-    if(repeats[p]) totalRepes = Object.values(repeats[p]).reduce((a,b)=>a+b,0);
+    let totalRepes = 0; if(repeats[p]) totalRepes = Object.values(repeats[p]).reduce((a,b)=>a+b,0);
     
     if(filter==='missing' && m===0) continue;
     if(filter==='complete' && m>0) continue;
     if(filter==='repeats' && totalRepes===0) continue;
     
-    const card = document.createElement('div');
-    card.className = 'country-card' + (m>0?' has-missing':' complete');
-    
+    const card = document.createElement('div'); card.className = 'country-card' + (m>0?' has-missing':' complete');
     if(totalRepes > 0){
-      const rb = document.createElement('div');
-      rb.className = 'badge-repeats'; rb.textContent = totalRepes; card.appendChild(rb);
+      const rb = document.createElement('div'); rb.className = 'badge-repeats'; rb.textContent = totalRepes; card.appendChild(rb);
     }
-    
     const flagRow = document.createElement('div'); flagRow.className = 'card-flag-row';
     const fc = document.createElement('div'); fc.className = 'flag-cell';
     const fs = document.createElement('span'); fs.textContent = EMOJI[p]||''; fs.style.fontSize = '20px';
@@ -620,34 +579,24 @@ window.renderCountries = function() {
     
     const st = document.createElement('div'); st.className = 'card-stats';
     st.innerHTML = m > 0 ? `<div class="cs-item cs-miss"><i class="ti ti-x"></i>${m}</div>` : `<div class="cs-item cs-ok"><i class="ti ti-check"></i>OK</div>`;
-    card.appendChild(st);
-    card.onclick = () => openModal(p);
-    frag.appendChild(card);
+    card.appendChild(st); card.onclick = () => openModal(p); frag.appendChild(card);
   }
-  grid.appendChild(frag);
+  grid.appendChild(frag); tw(grid);
 }
 
 let curPais = '';
 function openModal(p){
-  curPais = p;
-  document.getElementById('modal-flag-span').textContent = EMOJI[p]||'';
+  curPais = p; document.getElementById('modal-flag-span').textContent = EMOJI[p]||'';
   document.getElementById('modal-name').textContent = ' ' + p + ' — ' + NAMES[p];
-  renderModalNumbers();
-  document.getElementById('modal-bg').classList.add('open');
+  renderModalNumbers(); document.getElementById('modal-bg').classList.add('open');
 }
 
 function renderModalNumbers() {
-  const p = curPais;
-  const m = new Set(missing[p]||[]);
-  const repObj = repeats[p]||{};
-  const grid = document.getElementById('modal-nums');
-  grid.innerHTML = '';
+  const p = curPais; const m = new Set(missing[p]||[]); const repObj = repeats[p]||{};
+  const grid = document.getElementById('modal-nums'); grid.innerHTML = '';
   
   for(let i=1; i<=getMax(p); i++){
-    const inM = m.has(i);
-    const cantRep = repObj[i]||0;
-    const btn = document.createElement('button');
-    btn.textContent = i;
+    const inM = m.has(i); const cantRep = repObj[i]||0; const btn = document.createElement('button'); btn.textContent = i;
     
     if(inM){ btn.className = 'num-btn missing-mark'; } 
     else if(cantRep > 0){
@@ -663,8 +612,7 @@ function renderModalNumbers() {
     };
     btn.oncontextmenu = (e) => {
       e.preventDefault();
-      if(cantRep > 1) { repeats[p][i]--; }
-      else if(cantRep === 1) { delete repeats[p][i]; }
+      if(cantRep > 1) { repeats[p][i]--; } else if(cantRep === 1) { delete repeats[p][i]; }
       else if(!inM) { if(!missing[p]) missing[p]=[]; missing[p].push(i); missing[p].sort((a,b)=>a-b); }
       syncToCloud(); renderAll(); renderModalNumbers();
     };
@@ -672,52 +620,28 @@ function renderModalNumbers() {
   }
 }
 
-window.closeModal = function(e){
-  if(!e || e.target === document.getElementById('modal-bg')){
-    document.getElementById('modal-bg').classList.remove('open');
-    renderCountries();
-  }
-}
+window.closeModal = function(e){ if(!e || e.target === document.getElementById('modal-bg')){ document.getElementById('modal-bg').classList.remove('open'); document.body.style.overflow = ''; renderCountries(); } }
 
 window.showTab = function(t) {
-  document.querySelectorAll('.tab').forEach((el,i)=>{el.classList.toggle('active',['album','comu','cross','share'][i]===t)});
+  document.querySelectorAll('.tab').forEach((el,i)=>{el.classList.toggle('active',['album','comu','cross','import'][i]===t)});
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
-  document.getElementById('tab-'+(t==='share'?'share':t==='cross'?'cross':t==='comu'?'comu':'album')).classList.add('active');
-  if(t==='album') renderCountries();
-  if(t==='share') setPreview(curPreview);
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='album') renderCountries(); if(t==='share') setPreview(curPreview);
 }
 
-window.setPreview = function(t) {
-  curPreview = t;
-  document.getElementById('share-preview-box').textContent = buildText(t);
-  document.getElementById('pt-missing').classList.toggle('active', t==='missing');
-  document.getElementById('pt-repeats').classList.toggle('active', t==='repeats');
-}
+window.setPreview = function(t) { curPreview = t; document.getElementById('share-preview-box').textContent = buildText(t); document.getElementById('pt-missing').classList.toggle('active', t==='missing'); document.getElementById('pt-repeats').classList.toggle('active', t==='repeats'); }
 
 function buildText(type){
-  const hdr = type=='missing'?'Me faltan':'Repetidas';
-  const lines = [`⚽ *Figus Panini - FIFA World Cup 2026*`,`*${hdr}*`,''];
+  const hdr = type=='missing'?'Me faltan':'Repetidas'; const lines = [`⚽ *Figus Panini - FIFA World Cup 2026*`,`*${hdr}*`,''];
   for(const p of PAISES){
-    if(type==='missing'){
-      const nums = missing[p]||[]; if(nums.length) lines.push(`${EMOJI[p]||''} ${p}: ${nums.join(', ')}`);
-    } else {
-      const repObj = repeats[p]||{}; const repArr = [];
-      Object.keys(repObj).forEach(n=>{ if(repObj[n]>0) repArr.push(repObj[n]>1?`${n}(x${repObj[n]})` : `${n}`); });
-      if(repArr.length) lines.push(`${EMOJI[p]||''} ${p}: ${repArr.join(', ')}`);
-    }
+    if(type==='missing'){ const nums = missing[p]||[]; if(nums.length) lines.push(`${EMOJI[p]||''} ${p}: ${nums.join(', ')}`); }
+    else { const repObj = repeats[p]||{}; const repArr = []; Object.keys(repObj).forEach(n=>{ if(repObj[n]>0) repArr.push(repObj[n]>1?`${n}(x${repObj[n]})` : `${n}`); }); if(repArr.length) lines.push(`${EMOJI[p]||''} ${p}: ${repArr.join(', ')}`); }
   }
   return lines.join('\n');
 }
 
-window.shareAll = function(type) {
-  navigator.clipboard.writeText(buildText(type)).then(()=>showToast("¡Copiado al portapapeles!"));
-}
-
-function showToast(msg){
-  const el = document.getElementById('toast'); el.textContent = msg; el.style.opacity = '1';
-  setTimeout(()=>el.style.opacity='0', 1800);
-}
-
+window.shareAll = function(type) { navigator.clipboard.writeText(buildText(type)).then(()=>showToast("¡Copiado al portapapeles!")); }
+function showToast(msg){ const el = document.getElementById('toast'); el.textContent = msg; el.style.opacity = '1'; setTimeout(()=>el.style.opacity='0', 1800); }
 function renderAll(){ renderCountries(); updateStats(); }
 </script>
 </body>
