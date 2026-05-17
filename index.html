@@ -339,7 +339,7 @@ let curPreview = 'missing';
 const TOTAL_FIGUS = 994;
 const PAISES = ['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
 const NAMES = {'FWC':'FIFA WC','MEX':'México','RSA':'Sudáfrica','KOR':'Corea del Sur','CZE':'Rep. Checa','CAN':'Canadá','BIH':'Bosnia','QAT':'Qatar','SUI':'Suiza','BRA':'Brasil','MAR':'Marruecos','HAI':'Haití','SCO':'Escocia','USA':'EE.UU.','PAR':'Paraguay','AUS':'Australia','TUR':'Turquía','GER':'Alemania','CUW':'Curazao','CIV':'Costa de Marfil','ECU':'Ecuador','NED':'P. Bajos','JPN':'Japón','SWE':'Suecia','TUN':'Túnez','BEL':'Bélgica','EGY':'Egipto','IRN':'Irán','NZL':'Nueva Zelanda','ESP':'España','CPV':'Cabo Verde','KSA':'Arabia Saudita','URU':'Uruguay','FRA':'Francia','SEN':'Senegal','IRQ':'Irak','NOR':'Noruega','ARG':'Argentina','ALG':'Argelia','AUT':'Austria','JOR':'Jordania','POR':'Portugal','COD':'Congo DR','UZB':'Uzbekistán','COL':'Colombia','ENG':'Inglaterra','CRO':'Croacia','GHA':'Ghana','PAN':'Panamá','CC':'Coca-Cola'};
-const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴\u200D󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'JJapón','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
+const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴\u200D󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
 const MAX = {'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
 
@@ -431,7 +431,6 @@ function calculateLiveCrossDeal(friendId) {
   };
 }
 
-// PARSEADORES HISTORICOS ORIGINALES RESTAURADOS
 function parseText(text){
   const result={};
   for(const raw of text.split('\n')){
@@ -482,7 +481,6 @@ function parseFullExport(text){
   return {missing:mis,repeats:rep};
 }
 
-// LOGICA DE RECONEXION DE LOS BOTONES DE LA PESTAÑA IMPORTAR DIRECTO A LA NUBE
 window.importFull = function(modeSelect) {
   const text = document.getElementById('import-full').value;
   const parsed = parseFullExport(text);
@@ -498,7 +496,7 @@ window.importFull = function(modeSelect) {
   }
   if(modeSelect === 'both' || modeSelect === 'repeats') {
     if(rk) {
-      repeats = {}; // Limpia e importa lote nuevo físico
+      repeats = {}; 
       for(const [p,obj] of Object.entries(parsed.repeats)) { repeats[p] = obj; }
     }
   }
@@ -533,7 +531,19 @@ window.clearCross = function() {
   document.getElementById('cross-count').textContent='—'; document.getElementById('sync-cross-btn').style.display='none';
 }
 
-// ENGINE VISUAL DE CASILLEROS
+// ==========================================
+// MOTOR MATEMÁTICO CORREGIDO PARA LOS KPI
+// ==========================================
+function getHaveCount(p){
+  const max = getMax(p);
+  const mSet = new Set(missing[p] || []);
+  let c = 0;
+  for(let i = 1; i <= max; i++){
+    if(!mSet.has(i)) c++; // Si no está en Faltantes, significa que la TENGO pegada
+  }
+  return c;
+}
+
 function updateStats(){
   let totalFaltantes=0, totalRepesAbsolutas=0, totalTengoUnicas=0;
   for(const p of PAISES){
@@ -605,7 +615,7 @@ function renderModalNumbers() {
     } else { btn.className = 'num-btn have-mark'; }
     
     btn.onclick = () => {
-      if(m.has(i)) { missing[p] = missing[p].filter(x => x !== i); }
+      if(missing[p].includes(i)) { missing[p] = missing[p].filter(x => x !== i); }
       else if(cantRep === 0) { if(!repeats[p]) repeats[p]={}; repeats[p][i]=1; }
       else { repeats[p][i]++; }
       syncToCloud(); renderAll(); renderModalNumbers();
@@ -613,7 +623,7 @@ function renderModalNumbers() {
     btn.oncontextmenu = (e) => {
       e.preventDefault();
       if(cantRep > 1) { repeats[p][i]--; } else if(cantRep === 1) { delete repeats[p][i]; }
-      else if(!inM) { if(!missing[p]) missing[p]=[]; missing[p].push(i); missing[p].sort((a,b)=>a-b); }
+      else if(!missing[p].includes(i)) { if(!missing[p]) missing[p]=[]; missing[p].push(i); missing[p].sort((a,b)=>a-b); }
       syncToCloud(); renderAll(); renderModalNumbers();
     };
     grid.appendChild(btn);
