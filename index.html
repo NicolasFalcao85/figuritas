@@ -77,21 +77,26 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .cs-miss{background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6}
 .cs-ok{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;font-size:10px}
 
-/* INTERACTIVE QUICK CONTROLS BADGE */
-.badge-repeats-container{position:absolute;top:-8px;right:-4px;background:var(--badge-blue);color:#fff;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.25);transition:all 0.2s cubic-bezier(0.4,0,0.2,1);overflow:hidden;z-index:5;font-family:sans-serif;padding:0 4px}
-.badge-repeats-container.collapsed{width:22px;padding:0}
-.badge-repeats-container.expanded{width:68px}
+/* STATIC NOTIFICATION BADGE FOR REPEATS (MAIN SCREEN) */
+.badge-repeats{position:absolute;top:-6px;right:-6px;background:var(--badge-blue);color:#fff;font-size:11px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.2);animation:popIn 0.2s ease;font-family:sans-serif}
 
-.badge-btn{width:18px;height:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.25);border:none;color:#fff;font-size:12px;font-weight:bold;border-radius:50%;cursor:pointer;transition:background 0.1s}
-.badge-btn:active{background:rgba(255,255,255,0.45)}
-.badge-display{font-size:11px;font-weight:800;min-width:14px;text-align:center;margin:0 4px;user-select:none}
+@keyframes popIn {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
 
 @media(prefers-color-scheme:dark){
   .cs-miss{background:#3a1010;color:#ff7070;border-color:#5a2020}
   .cs-ok{background:#0a1e2e;color:#60b0e0;border-color:#1a3a5a}
 }
 
-/* MODAL */
+/* MODAL INTERACTIVE BADGE CONTROL */
+.modal-repeats-counter{background:var(--badge-blue);color:#fff;border-radius:20px;display:inline-flex;align-items:center;padding:4px 8px;box-shadow:0 2px 6px rgba(0,0,0,0.2);font-family:sans-serif}
+.modal-badge-btn{width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.25);border:none;color:#fff;font-size:14px;font-weight:bold;border-radius:50%;cursor:pointer;transition:background 0.1s}
+.modal-badge-btn:active{background:rgba(255,255,255,0.45)}
+.modal-badge-display{font-size:12px;font-weight:800;min-width:20px;text-align:center;margin:0 6px;user-select:none}
+
+/* MODAL STRUCTURE */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,20px)}
@@ -100,7 +105,9 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .modal-title img{width:24px;height:24px}
 .close-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:16px;cursor:pointer;line-height:1;padding:5px 12px;border-radius:20px;font-weight:700}
 .modal-body{padding:14px}
-.modal-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;font-weight:700;align-items:center}
+.modal-legend{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:11px;font-weight:700;gap:8px}
+.modal-legend-items{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
 .num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:10px}
 .num-btn{position:relative;padding:11px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.12s;font-family:'Barlow Condensed',sans-serif;background:var(--bg2);color:var(--text2);touch-action:manipulation;user-select:none}
 .num-btn.have-mark{background:#f0fff4;border-color:#81c784;color:#2e7d32}
@@ -215,7 +222,7 @@ textarea:focus{border-color:var(--blue);outline:none}
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Control Interactiva de Repes</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Círculo = Repetidas</div>
   </div>
   <div class="country-grid" id="country-grid"></div>
 </div>
@@ -329,13 +336,23 @@ textarea:focus{border-color:var(--blue);outline:none}
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
+      <!-- CABECERA INTERACTIVA DEL MODAL -->
       <div class="modal-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Repe (Toca + veces)</div>
+        <div class="modal-legend-items">
+          <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
+        </div>
+        
+        <!-- Botones + y - para regular las repes del país de forma directa -->
+        <div class="modal-repeats-counter">
+          <button class="modal-badge-btn" onclick="alterCountryRepeatsCount(curPais, -1)">-</button>
+          <span class="modal-badge-display" id="modal-repeats-total-display">0</span>
+          <button class="modal-badge-btn" onclick="alterCountryRepeatsCount(curPais, 1)">+</button>
+        </div>
       </div>
+      
       <div class="num-grid" id="modal-nums"></div>
-      <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center">Toca repetidamente para sumar cantidades o mantené apretado para limpiar</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center">Toca los números para alternar entre Tengo/Falta o sumarle repes individuales</div>
       
       <div class="btn-row" style="margin-top:14px;justify-content:center">
         <button class="btn btn-wa" onclick="shareCountry()"><i class="ti ti-brand-whatsapp"></i> Compartir este equipo</button>
@@ -573,60 +590,12 @@ function renderCountries(){
     const card=document.createElement('div');
     card.className='country-card'+(m>0?' has-missing':' complete');
     
-    // CONTROL FLOTANTE INTERACTIVO DE REPETIDAS EN LA GRILLA PRINCIPAL
+    // GRILLA PRINCIPAL: Solo muestra el círculo estático con la cantidad total
     if(totalRepes>0){
-      const container=document.createElement('div');
-      container.className='badge-repeats-container collapsed';
-      
-      // Botón para restar cantidad total al país
-      const btnMinus=document.createElement('button');
-      btnMinus.className='badge-btn';
-      btnMinus.textContent='-';
-      btnMinus.style.display='none';
-      btnMinus.onclick=(e)=>{
-        e.stopPropagation(); // Evita que se abra el modal del país
-        alterCountryRepeatsCount(p, -1);
-      };
-      
-      const display=document.createElement('span');
-      display.className='badge-display';
-      display.textContent=totalRepes;
-      
-      // Botón para sumar cantidad total al país
-      const btnPlus=document.createElement('button');
-      btnPlus.className='badge-btn';
-      btnPlus.textContent='+';
-      btnPlus.style.display='none';
-      btnPlus.onclick=(e)=>{
-        e.stopPropagation();
-        alterCountryRepeatsCount(p, 1);
-      };
-      
-      // Al hacerle touch/click expande el control revelando el + y el -
-      container.onclick=(e)=>{
-        e.stopPropagation();
-        if(container.classList.contains('collapsed')){
-          container.classList.remove('collapsed');
-          container.classList.add('expanded');
-          btnMinus.style.display='flex';
-          btnPlus.style.display='flex';
-          
-          // Se colapsa de forma automática tras 3.5 segundos de inactividad
-          setTimeout(()=>{
-            if(container && container.classList.contains('expanded')){
-              container.classList.remove('expanded');
-              container.classList.add('collapsed');
-              btnMinus.style.display='none';
-              btnPlus.style.display='none';
-            }
-          }, 3500);
-        }
-      };
-      
-      container.appendChild(btnMinus);
-      container.appendChild(display);
-      container.appendChild(btnPlus);
-      card.appendChild(container);
+      const rb=document.createElement('div');
+      rb.className='badge-repeats';
+      rb.textContent=totalRepes;
+      card.appendChild(rb);
     }
     
     const flagRow=document.createElement('div');flagRow.className='card-flag-row';
@@ -654,18 +623,67 @@ function renderCountries(){
   tw(grid);
 }
 
-// Modifica de forma masiva/rápida las repetidas desde la grilla principal
+let curPais='';
+function openModal(p){
+  curPais=p;
+  const fs=document.getElementById('modal-flag-span');
+  fs.textContent=EMOJI[p]||'';fs.style.fontSize='22px';fs.style.lineHeight='1';
+  document.getElementById('modal-name').textContent=' '+p+' — '+NAMES[p];
+  
+  // Sincroniza la cantidad total del badge interactivo interno del modal
+  document.getElementById('modal-repeats-total-display').textContent = getRepeatsCountTotal(p);
+  
+  renderModalNumbers();
+  
+  tw(fs);
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function renderModalNumbers() {
+  const p = curPais;
+  const m = new Set(missing[p]||[]);
+  const repObj = repeats[p]||{};
+  
+  const grid = document.getElementById('modal-nums');
+  grid.innerHTML = '';
+  
+  for(let i=1;i<=getMax(p);i++){
+    const inM = m.has(i);
+    const cantRep = repObj[i]||0;
+    
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    
+    if(inM){
+      btn.className = 'num-btn missing-mark';
+    } else if(cantRep > 0){
+      btn.className = 'num-btn repeat-mark';
+      const nb = document.createElement('div');
+      nb.className = 'num-btn-badge';
+      nb.textContent = cantRep;
+      btn.appendChild(nb);
+    } else {
+      btn.className = 'num-btn have-mark';
+    }
+    
+    btn.onclick = () => cycleNum(p,i,btn);
+    btn.oncontextmenu = (e) => { e.preventDefault(); resetToHave(p,i,btn); };
+    
+    grid.appendChild(btn);
+  }
+}
+
+// MODAL CONTROLLER: Cambia la cantidad de repes de forma masiva desde adentro del modal (+ y -)
 function alterCountryRepeatsCount(p, val){
   if(!repeats[p]) repeats[p]={};
   
   if(val > 0){
-    // Busca el primer nro de figu del país que ya sea repe para sumarle, o crea la primera en nro 1 si estuviese vacío
-    let keys=Object.keys(repeats[p]);
+    let keys = Object.keys(repeats[p]);
     let targetNum = keys.length > 0 ? keys[0] : "1";
     repeats[p][targetNum] = (repeats[p][targetNum]||0) + 1;
   } else {
-    // Resta de las repes existentes del país hasta vaciar
-    let keys=Object.keys(repeats[p]);
+    let keys = Object.keys(repeats[p]);
     if(keys.length > 0){
       let targetNum = keys[0];
       if(repeats[p][targetNum] > 1){
@@ -678,47 +696,11 @@ function alterCountryRepeatsCount(p, val){
   
   save();
   updateStats();
-  renderCountries();
-}
-
-let curPais='';
-function openModal(p){
-  curPais=p;
-  const fs=document.getElementById('modal-flag-span');
-  fs.textContent=EMOJI[p]||'';fs.style.fontSize='22px';fs.style.lineHeight='1';
-  document.getElementById('modal-name').textContent=' '+p+' — '+NAMES[p];
   
-  const m=new Set(missing[p]||[]);
-  const repObj=repeats[p]||{};
-  
-  const grid=document.getElementById('modal-nums');grid.innerHTML='';
-  for(let i=1;i<=getMax(p);i++){
-    const inM=m.has(i);
-    const cantRep=repObj[i]||0;
-    
-    const btn=document.createElement('button');
-    btn.textContent=i;
-    
-    if(inM){
-      btn.className='num-btn missing-mark';
-    } else if(cantRep>0){
-      btn.className='num-btn repeat-mark';
-      const nb=document.createElement('div');
-      nb.className='num-btn-badge';
-      nb.textContent=cantRep;
-      btn.appendChild(nb);
-    } else {
-      btn.className='num-btn have-mark';
-    }
-    
-    btn.onclick=()=>cycleNum(p,i,btn);
-    btn.oncontextmenu=(e)=>{ e.preventDefault(); resetToHave(p,i,btn); };
-    
-    grid.appendChild(btn);
-  }
-  tw(fs);
-  document.getElementById('modal-bg').classList.add('open');
-  document.body.style.overflow='hidden';
+  // Actualiza el badge numérico interactivo del modal instantáneamente
+  document.getElementById('modal-repeats-total-display').textContent = getRepeatsCountTotal(p);
+  // Redibuja los casilleros numéricos del modal para reflejar el cambio físico
+  renderModalNumbers();
 }
 
 function cycleNum(p,n,btn){
@@ -752,7 +734,9 @@ function cycleNum(p,n,btn){
     btn.className='num-btn have-mark';
   }
   
-  save();updateStats();renderCountries();
+  save();
+  updateStats();
+  document.getElementById('modal-repeats-total-display').textContent = getRepeatsCountTotal(p);
 }
 
 function resetToHave(p,n,btn){
@@ -761,7 +745,9 @@ function resetToHave(p,n,btn){
   const oldBadge=btn.querySelector('.num-btn-badge');
   if(oldBadge) oldBadge.remove();
   btn.className='num-btn have-mark';
-  save();updateStats();renderCountries();
+  save();
+  updateStats();
+  document.getElementById('modal-repeats-total-display').textContent = getRepeatsCountTotal(p);
   showToast("Reseteado a 'Tengo'");
 }
 
@@ -769,6 +755,7 @@ function closeModal(e){
   if(!e||e.target===document.getElementById('modal-bg')){
     document.getElementById('modal-bg').classList.remove('open');
     document.body.style.overflow='';
+    renderCountries(); // Sincroniza la vista principal al cerrar modal
   }
 }
 
