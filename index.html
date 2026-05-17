@@ -349,7 +349,7 @@ const TOTAL_FIGUS=994;
 const PAISES=['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
 const NAMES={'FWC':'FIFA WC','MEX':'México','RSA':'Sudáfrica','KOR':'Corea del Sur','CZE':'Rep. Checa','CAN':'Canadá','BIH':'Bosnia','QAT':'Qatar','SUI':'Suiza','BRA':'Brasil','MAR':'Marruecos','HAI':'Haití','SCO':'Escocia','USA':'EE.UU.','PAR':'Paraguay','AUS':'Australia','TUR':'Turquía','GER':'Alemania','CUW':'Curazao','CIV':'Costa de Marfil','ECU':'Ecuador','NED':'P. Bajos','JPN':'Japón','SWE':'Suecia','TUN':'Túnez','BEL':'Bélgica','EGY':'Egipto','IRN':'Irán','NZL':'Nueva Zelanda','ESP':'España','CPV':'Cabo Verde','KSA':'Arabia Saudita','URU':'Uruguay','FRA':'Francia','SEN':'Senegal','IRQ':'Irak','NOR':'Noruega','ARG':'Argentina','ALG':'Argelia','AUT':'Austria','JOR':'Jordania','POR':'Portugal','COD':'Congo DR','UZB':'Uzbekistán','COL':'Colombia','ENG':'Inglaterra','CRO':'Croacia','GHA':'Ghana','PAN':'Panamá','CC':'Coca-Cola'};
 
-// CONFIGURACION DE EMOJIS CORREGIDA PARA EMISORAS DE TEXTO CORROMPIDAS EN SCO Y ENG
+// REPARADAS LAS EMISIONES URL-ENCODE DE LAS BANDERAS REGIONALES DE SCOTLAND E ENGLAND
 const EMOJI={'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
 const MAX={'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
@@ -807,9 +807,16 @@ function copyCross(){
 function openWA(text){window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');}
 
 load();
+// CARGA INICIAL LIMPIA DESDE CERO (0% COMPLETADO) PARA TODOS LOS USUARIOS NUEVOS
 if(!Object.keys(missing).length && !Object.keys(repeats).length){
-  missing={"FWC":[1,2,6,7,8,9,10,13,17,19],"MEX":[6,11],"RSA":[3,10,11,15,16,19],"KOR":[3,11,15,16,19],"ARG":[1,2,3,4,10]};
-  repeats={"FWC":{"11":1},"KOR":{"4":2,"8":1,"12":3},"CAN":{"3":1,"7":2},"ARG":{"8":3}};
+  PAISES.forEach(p => {
+    missing[p] = [];
+    const max = getMax(p);
+    for(let i = 1; i <= max; i++) {
+      missing[p].push(i);
+    }
+  });
+  repeats = {};
   save();
 }
 renderAll();
