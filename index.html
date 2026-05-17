@@ -75,24 +75,6 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 
 .badge-repeats{position:absolute;top:-6px;right:-6px;background:var(--badge-blue);color:#fff;font-size:11px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.2);font-family:sans-serif}
 
-/* MODAL STRUCTURE */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:flex-end;justify-content:center}
-.modal-bg.open{display:flex}
-.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,20px)}
-.modal-head{background:var(--blue);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;border-radius:20px 20px 0 0;z-index:10}
-.modal-title{color:#fff;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;display:flex;align-items:center;gap:8px}
-.modal-title img{width:24px;height:24px}
-.close-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:16px;cursor:pointer;line-height:1;padding:5px 12px;border-radius:20px;font-weight:700}
-.modal-body{padding:14px}
-
-.num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:10px}
-.num-btn{position:relative;padding:11px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.12s;font-family:'Barlow Condensed',sans-serif;background:var(--bg2);color:var(--text2);touch-action:manipulation;user-select:none}
-.num-btn.have-mark{background:#f0fff4;border-color:#81c784;color:#2e7d32}
-.num-btn.missing-mark{background:#fff0f0;border-color:#e57373;color:#c0392b}
-.num-btn.repeat-mark{background:#eff6ff;border-color:#93c5fd;color:#1e40af}
-.num-btn:active{transform:scale(0.95)}
-.num-btn-badge{position:absolute;top:-4px;right:-4px;background:var(--badge-blue);color:white;font-size:9px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-weight:bold}
-
 /* INTERFAZ GENERAL GRÁFICA */
 .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
 .panel-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--blue);margin-bottom:8px;border-bottom:2px solid var(--gold);padding-bottom:5px}
@@ -252,7 +234,7 @@ let lastCrossedMatches = [];
 const TOTAL_FIGUS = 994;
 const PAISES = ['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
 const NAMES = {'FWC':'FIFA WC','MEX':'México','RSA':'Sudáfrica','KOR':'Corea del Sur','CZE':'Rep. Checa','CAN':'Canadá','BIH':'Bosnia','QAT':'Qatar','SUI':'Suiza','BRA':'Brasil','MAR':'Marruecos','HAI':'Haití','SCO':'Escocia','USA':'EE.UU.','PAR':'Paraguay','AUS':'Australia','TUR':'Turquía','GER':'Alemania','CUW':'Curazao','CIV':'Costa de Marfil','ECU':'Ecuador','NED':'P. Bajos','JPN':'Japón','SWE':'Suecia','TUN':'Túnez','BEL':'Bélgica','EGY':'Egipto','IRN':'Irán','NZL':'Nueva Zelanda','ESP':'España','CPV':'Cabo Verde','KSA':'Arabia Saudita','URU':'Uruguay','FRA':'Francia','SEN':'Senegal','IRQ':'Irak','NOR':'Noruega','ARG':'Argentina','ALG':'Argelia','AUT':'Austria','JOR':'Jordania','POR':'Portugal','COD':'Congo DR','UZB':'Uzbekistán','COL':'Colombia','ENG':'Inglaterra','CRO':'Croacia','GHA':'Ghana','PAN':'Panamá','CC':'Coca-Cola'};
-const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧睿','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴\u200D󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
+const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴\u200D󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
 const MAX = {'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
 
@@ -317,27 +299,21 @@ function listenCommunityChannels() {
   });
 }
 
-// 1- MODIFICACIÓN INTERNA: Cruce 1 a 1 Equitativo (Corta al menor lote)
 function calculateLiveCrossDeal(friendId) {
   const friend = globalUsersDatabase[friendId]; if(!friend) return;
   const rawYouGiveMatches = []; 
   const rawHeGivesMatches = []; 
 
-  // Qué tiene él repetido que a vos te sirve
   for(const [p, repObj] of Object.entries(friend.repeats || {})) {
     const myM = missing[p] || [];
     Object.keys(repObj).forEach(nStr => { if(myM.includes(parseInt(nStr)) && repObj[nStr] > 0) rawHeGivesMatches.push(`${p}${nStr}`); });
   }
-  // Qué tenés vos repetido que a él le sirve
   for(const [p, repObj] of Object.entries(repeats)) {
     const friendM = friend.missing?.[p] || [];
     Object.keys(repObj).forEach(nStr => { if(friendM.includes(parseInt(nStr)) && repObj[nStr] > 0) rawYouGiveMatches.push(`${p}${nStr}`); });
   }
 
-  // Encontrar el techo mínimo para el trato simétrico
   const maxEquitativo = Math.min(rawYouGiveMatches.length, rawHeGivesMatches.length);
-  
-  // Recortar arrays para que sea exactamente la misma cantidad para ambos lados
   const finalHeGives = rawHeGivesMatches.slice(0, maxEquitativo);
   const finalYouGive = rawYouGiveMatches.slice(0, maxEquitativo);
 
@@ -348,7 +324,6 @@ function calculateLiveCrossDeal(friendId) {
   hgBox.textContent = finalHeGives.length > 0 ? finalHeGives.join(', ') : "Ninguna (Falta simetría) :(";
   ygBox.textContent = finalYouGive.length > 0 ? finalYouGive.join(', ') : "Ninguna (Falta simetría) :(";
 
-  // 2- MODIFICACIÓN INTERNA: Envío genérico para elegir contacto de WhatsApp directamente en destino
   document.getElementById('deal-wa-btn').onclick = () => {
     if(maxEquitativo === 0) { alert("No hay suficientes figuritas simétricas de intercambio para armar un trato."); return; }
     const text = `⚽ *¡Hola! Cruzando nuestro panel de figus vi que podemos hacer un cambio justo de ${maxEquitativo} por ${maxEquitativo}:* \n\n➕ *Me das:* ${hgBox.textContent}\n➖ *Te doy:* ${ygBox.textContent}\n\n¿Te sirve? ¡Confirmame y separamos! 🤝`;
@@ -358,23 +333,48 @@ function calculateLiveCrossDeal(friendId) {
   document.getElementById('panel-deal-result').scrollIntoView({ behavior: 'smooth' });
 }
 
+// ARREGLADO GLOBAL: Parseador inteligente que soporta emojis, mayúsculas y multiplicadores complejos (x2)
 function parseFullExport(text){
   let mode=null; const mis={}, rep={};
   for(const p of PAISES) mis[p] = []; 
   
   for(const raw of text.split('\n')){
     const line=raw.trim();if(!line)continue;
+    
+    // Detecta "Me faltan", "❌ ME FALTAN" o cualquier variante ignorando case y emojis
     if(/me faltan/i.test(line)){mode='missing';continue;}
-    if(/^repetidas/i.test(line)){mode='repeats';continue;}
-    if(/^(figuritas app|usa méx|descarga|https?:)/i.test(line)){mode=null;continue;}
+    // Detecta "Repetidas", "🔁 REPETIDAS" o cualquier variante
+    if(/repetidas/i.test(line)){mode='repeats';continue;}
+    if(/^(figuritas app|usa méx|descarga|https?:|🏆 album master)/i.test(line)){mode=null;continue;}
     if(!mode)continue;
-    const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d]/g,' ').trim();
-    const m=s.match(/^([A-Z]{2,4})\b[^:]*:\s*([\d,\s]+)/i);
+    
+    // Limpia emojis, banderas y símbolos raros para quedarse con el texto puro "ARG: 1, 2, 3"
+    const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d()x]/g,' ').trim();
+    const m=s.match(/^([A-Z]{2,4})\b[^:]*:\s*(.+)/i);
+    
     if(m){
       const p=m[1].toUpperCase();
       if(PAISES.includes(p)){
-        const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
-        if(nums.length){ if(mode==='missing'){ mis[p]=[...new Set([...mis[p],...nums])].sort((a,b)=>a-b); } else { if(!rep[p])rep[p]={}; nums.forEach(n=>{rep[p][n]=(rep[p][n]||0)+1;}); } }
+        // Divide los números por comas o espacios
+        const rawTokens = m[2].split(/[\s,]+/);
+        rawTokens.forEach(token => {
+          // Captura el número y opcionalmente el multiplicador tipo 14(x2) o 14(2) o 14x2
+          const matchNum = token.match(/^(\d+)(?:\([xX]?(\d+)\)|[xX](\d+))?/);
+          if(matchNum){
+            const n = parseInt(matchNum[1]);
+            // Si tiene multiplicador lo toma, si no, por defecto vale 1
+            const cantidad = parseInt(matchNum[2] || matchNum[3] || "1");
+            if(!isNaN(n) && n > 0){
+              if(mode==='missing'){
+                mis[p].push(n);
+              } else {
+                if(!rep[p]) rep[p]={};
+                rep[p][n] = (rep[p][n]||0) + cantidad;
+              }
+            }
+          }
+        });
+        if(mode==='missing') mis[p] = [...new Set(mis[p])].sort((a,b)=>a-b);
       }
     }
   }
