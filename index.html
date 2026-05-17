@@ -12,8 +12,8 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--red:#E8192C;--blue:#003DA5;--gold:#FFB81C;--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#777;--border:#e0e0e0;--bg2:#f5f5f5;--badge-blue:#2563eb;--badge-dark:#1d4ed8}
-@media(prefers-color-scheme:dark){:root{--bg:#0f0f1a;--card:#1c1c2e;--text:#f0f0f0;--text2:#999;--border:#2a2a3a;--bg2:#252535;--badge-blue:#3b82f6;--badge-dark:#1d4ed8}}
+:root{--red:#E8192C;--blue:#003DA5;--gold:#FFB81C;--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#777;--border:#e0e0e0;--bg2:#f5f5f5;--badge-blue:#2563eb}
+@media(prefers-color-scheme:dark){:root{--bg:#0f0f1a;--card:#1c1c2e;--text:#f0f0f0;--text2:#999;--border:#2a2a3a;--bg2:#252535;--badge-blue:#3b82f6}}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Barlow Condensed',sans-serif;-webkit-tap-highlight-color:transparent}
 body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 
@@ -77,7 +77,7 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .cs-miss{background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6}
 .cs-ok{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;font-size:10px}
 
-/* STATIC NOTIFICATION BADGE FOR REPEATS (MAIN SCREEN) */
+/* STATIC BADGE FOR TOTAL REPEATS PER COUNTRY */
 .badge-repeats{position:absolute;top:-6px;right:-6px;background:var(--badge-blue);color:#fff;font-size:11px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.2);animation:popIn 0.2s ease;font-family:sans-serif}
 
 @keyframes popIn {
@@ -90,12 +90,6 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
   .cs-ok{background:#0a1e2e;color:#60b0e0;border-color:#1a3a5a}
 }
 
-/* MODAL INTERACTIVE BADGE CONTROL */
-.modal-repeats-counter{background:var(--badge-blue);color:#fff;border-radius:20px;display:inline-flex;align-items:center;padding:4px 8px;box-shadow:0 2px 6px rgba(0,0,0,0.2);font-family:sans-serif}
-.modal-badge-btn{width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.25);border:none;color:#fff;font-size:14px;font-weight:bold;border-radius:50%;cursor:pointer;transition:background 0.1s}
-.modal-badge-btn:active{background:rgba(255,255,255,0.45)}
-.modal-badge-display{font-size:12px;font-weight:800;min-width:20px;text-align:center;margin:0 6px;user-select:none}
-
 /* MODAL STRUCTURE */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
@@ -105,17 +99,16 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .modal-title img{width:24px;height:24px}
 .close-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:16px;cursor:pointer;line-height:1;padding:5px 12px;border-radius:20px;font-weight:700}
 .modal-body{padding:14px}
-.modal-legend{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:11px;font-weight:700;gap:8px}
-.modal-legend-items{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.modal-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;font-weight:700;align-items:center}
 
 .num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:10px}
 .num-btn{position:relative;padding:11px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.12s;font-family:'Barlow Condensed',sans-serif;background:var(--bg2);color:var(--text2);touch-action:manipulation;user-select:none}
 .num-btn.have-mark{background:#f0fff4;border-color:#81c784;color:#2e7d32}
 .num-btn.missing-mark{background:#fff0f0;border-color:#e57373;color:#c0392b}
 .num-btn.repeat-mark{background:#eff6ff;border-color:#93c5fd;color:#1e40af}
-.num-btn:active{transform:scale(0.9)}
+.num-btn:active{transform:scale(0.95)}
 
-/* Mini badge inside button for multiples */
+/* Mini badge inside button for multiple repeats count */
 .num-btn-badge{position:absolute;top:-4px;right:-4px;background:var(--badge-blue);color:white;font-size:9px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-weight:bold}
 
 @media(prefers-color-scheme:dark){
@@ -222,7 +215,7 @@ textarea:focus{border-color:var(--blue);outline:none}
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Círculo = Repetidas</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Azul = Repetida</div>
   </div>
   <div class="country-grid" id="country-grid"></div>
 </div>
@@ -336,23 +329,16 @@ textarea:focus{border-color:var(--blue);outline:none}
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <!-- CABECERA INTERACTIVA DEL MODAL -->
       <div class="modal-legend">
-        <div class="modal-legend-items">
-          <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
-        </div>
-        
-        <!-- Botones + y - para regular las repes del país de forma directa -->
-        <div class="modal-repeats-counter">
-          <button class="modal-badge-btn" onclick="alterCountryRepeatsCount(curPais, -1)">-</button>
-          <span class="modal-badge-display" id="modal-repeats-total-display">0</span>
-          <button class="modal-badge-btn" onclick="alterCountryRepeatsCount(curPais, 1)">+</button>
-        </div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Círculo = Cantidad Repes</div>
       </div>
-      
       <div class="num-grid" id="modal-nums"></div>
-      <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center">Toca los números para alternar entre Tengo/Falta o sumarle repes individuales</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center;line-height:1.4">
+        👉 <b>Click normal:</b> Falta ➔ Tengo ➔ Sumar Repes (+1)<br>
+        👉 <b>Mantené apretado / Click derecho:</b> Restar Repes ➔ Tengo ➔ Falta
+      </div>
       
       <div class="btn-row" style="margin-top:14px;justify-content:center">
         <button class="btn btn-wa" onclick="shareCountry()"><i class="ti ti-brand-whatsapp"></i> Compartir este equipo</button>
@@ -590,7 +576,6 @@ function renderCountries(){
     const card=document.createElement('div');
     card.className='country-card'+(m>0?' has-missing':' complete');
     
-    // GRILLA PRINCIPAL: Solo muestra el círculo estático con la cantidad total
     if(totalRepes>0){
       const rb=document.createElement('div');
       rb.className='badge-repeats';
@@ -630,9 +615,6 @@ function openModal(p){
   fs.textContent=EMOJI[p]||'';fs.style.fontSize='22px';fs.style.lineHeight='1';
   document.getElementById('modal-name').textContent=' '+p+' — '+NAMES[p];
   
-  // Sincroniza la cantidad total del badge interactivo interno del modal
-  document.getElementById('modal-repeats-total-display').textContent = getRepeatsCountTotal(p);
-  
   renderModalNumbers();
   
   tw(fs);
@@ -667,95 +649,88 @@ function renderModalNumbers() {
       btn.className = 'num-btn have-mark';
     }
     
-    btn.onclick = () => cycleNum(p,i,btn);
-    btn.oncontextmenu = (e) => { e.preventDefault(); resetToHave(p,i,btn); };
+    // CLICK NORMAL (Suma e incrementa repetidas)
+    btn.onclick = () => addOrIncrementFigu(p, i, btn);
+    
+    // CLICK DERECHO / LONG PRESS NATIVO (Resta repetidas o pasa a faltante)
+    btn.oncontextmenu = (e) => { 
+      e.preventDefault(); 
+      decrementOrRemoveFigu(p, i, btn); 
+    };
     
     grid.appendChild(btn);
   }
 }
 
-// MODAL CONTROLLER: Cambia la cantidad de repes de forma masiva desde adentro del modal (+ y -)
-function alterCountryRepeatsCount(p, val){
+// LOGICA DE REQUERIMIENTO INTERACTIVO: CLICK INCREMENTAL
+function addOrIncrementFigu(p, n, btn) {
+  if(!missing[p]) missing[p]=[];
   if(!repeats[p]) repeats[p]={};
   
-  if(val > 0){
-    let keys = Object.keys(repeats[p]);
-    let targetNum = keys.length > 0 ? keys[0] : "1";
-    repeats[p][targetNum] = (repeats[p][targetNum]||0) + 1;
-  } else {
-    let keys = Object.keys(repeats[p]);
-    if(keys.length > 0){
-      let targetNum = keys[0];
-      if(repeats[p][targetNum] > 1){
-        repeats[p][targetNum]--;
-      } else {
-        delete repeats[p][targetNum];
-      }
-    }
-  }
+  const inM = missing[p].includes(n);
+  const cantRep = repeats[p][n]||0;
   
-  save();
-  updateStats();
-  
-  // Actualiza el badge numérico interactivo del modal instantáneamente
-  document.getElementById('modal-repeats-total-display').textContent = getRepeatsCountTotal(p);
-  // Redibuja los casilleros numéricos del modal para reflejar el cambio físico
-  renderModalNumbers();
-}
-
-function cycleNum(p,n,btn){
-  if(!missing[p])missing[p]=[];
-  if(!repeats[p])repeats[p]={};
-  
-  const inM=missing[p].includes(n);
-  const cantRep=repeats[p][n]||0;
-  
-  const oldBadge=btn.querySelector('.num-btn-badge');
+  const oldBadge = btn.querySelector('.num-btn-badge');
   if(oldBadge) oldBadge.remove();
   
-  if(!inM && cantRep===0){
+  // 1. Si estaba como FALTANTE -> Click la pasa a TENGO (Limpio)
+  if(inM) {
+    missing[p] = missing[p].filter(x => x !== n);
+    btn.className = 'num-btn have-mark';
+  } 
+  // 2. Si estaba como TENGO -> Click la convierte en REPE x1
+  else if(!inM && cantRep === 0) {
+    repeats[p][n] = 1;
+    btn.className = 'num-btn repeat-mark';
+    const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = 1; btn.appendChild(nb);
+  } 
+  // 3. Si ya era REPE -> Click le sigue sumando cantidad física real (+1) de forma ilimitada
+  else if(cantRep > 0) {
+    repeats[p][n] = cantRep + 1;
+    btn.className = 'num-btn repeat-mark';
+    const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = repeats[p][n]; btn.appendChild(nb);
+  }
+  
+  save(); updateStats();
+}
+
+// LOGICA DE REQUERIMIENTO INTERACTIVO: CONTEXTMENU / LONG-PRESS DECREMENTAL
+function decrementOrRemoveFigu(p, n, btn) {
+  if(!missing[p]) missing[p]=[];
+  if(!repeats[p]) repeats[p]={};
+  
+  const inM = missing[p].includes(n);
+  const cantRep = repeats[p][n]||0;
+  
+  const oldBadge = btn.querySelector('.num-btn-badge');
+  if(oldBadge) oldBadge.remove();
+  
+  // 1. Si tiene varias repes -> Resta una unidad (Ej: x3 a x2)
+  if(cantRep > 1) {
+    repeats[p][n] = cantRep - 1;
+    btn.className = 'num-btn repeat-mark';
+    const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = repeats[p][n]; btn.appendChild(nb);
+  } 
+  // 2. Si tiene una sola repe (x1) -> La quita de repes y vuelve a TENGO (Limpio)
+  else if(cantRep === 1) {
+    delete repeats[p][n];
+    btn.className = 'num-btn have-mark';
+  } 
+  // 3. Si estaba en TENGO -> La quita y la pasa a FALTANTE (Roja)
+  else if(!inM && cantRep === 0) {
     missing[p].push(n);
     missing[p].sort((a,b)=>a-b);
-    btn.className='num-btn missing-mark';
-  }
-  else if(inM){
-    missing[p]=missing[p].filter(x=>x!==n);
-    repeats[p][n]=1;
-    btn.className='num-btn repeat-mark';
-    const nb=document.createElement('div');nb.className='num-btn-badge';nb.textContent=1;btn.appendChild(nb);
-  }
-  else if(cantRep>0 && cantRep < 4){
-    repeats[p][n] = cantRep + 1;
-    btn.className='num-btn repeat-mark';
-    const nb=document.createElement('div');nb.className='num-btn-badge';nb.textContent=repeats[p][n];btn.appendChild(nb);
-  }
-  else {
-    delete repeats[p][n];
-    btn.className='num-btn have-mark';
+    btn.className = 'num-btn missing-mark';
   }
   
-  save();
-  updateStats();
-  document.getElementById('modal-repeats-total-display').textContent = getRepeatsCountTotal(p);
-}
-
-function resetToHave(p,n,btn){
-  if(missing[p]) missing[p]=missing[p].filter(x=>x!==n);
-  if(repeats[p]) delete repeats[p][n];
-  const oldBadge=btn.querySelector('.num-btn-badge');
-  if(oldBadge) oldBadge.remove();
-  btn.className='num-btn have-mark';
-  save();
-  updateStats();
-  document.getElementById('modal-repeats-total-display').textContent = getRepeatsCountTotal(p);
-  showToast("Reseteado a 'Tengo'");
+  save(); updateStats();
 }
 
 function closeModal(e){
   if(!e||e.target===document.getElementById('modal-bg')){
     document.getElementById('modal-bg').classList.remove('open');
     document.body.style.overflow='';
-    renderCountries(); // Sincroniza la vista principal al cerrar modal
+    renderCountries(); 
   }
 }
 
