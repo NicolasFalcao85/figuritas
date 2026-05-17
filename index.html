@@ -215,6 +215,11 @@ textarea:focus{border-color:var(--blue);outline:none}
       <option value="repeats">Con Repetidas</option>
     </select>
   </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Azul = Cantidad Repes</div>
+  </div>
   <div class="country-grid" id="country-grid"></div>
 </div>
 
@@ -304,6 +309,10 @@ textarea:focus{border-color:var(--blue);outline:none}
     </div>
     <div class="modal-body">
       <div class="num-grid" id="modal-nums"></div>
+      <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center;line-height:1.4">
+        👉 <b>Click normal:</b> Falta ➔ Tengo ➔ Sumar Repes (+1)<br>
+        👉 <b>Mantené apretado / Click derecho:</b> Restar Repes ➔ Tengo ➔ Falta
+      </div>
     </div>
   </div>
 </div>
@@ -339,7 +348,7 @@ let curPreview = 'missing';
 const TOTAL_FIGUS = 994;
 const PAISES = ['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
 const NAMES = {'FWC':'FIFA WC','MEX':'México','RSA':'Sudáfrica','KOR':'Corea del Sur','CZE':'Rep. Checa','CAN':'Canadá','BIH':'Bosnia','QAT':'Qatar','SUI':'Suiza','BRA':'Brasil','MAR':'Marruecos','HAI':'Haití','SCO':'Escocia','USA':'EE.UU.','PAR':'Paraguay','AUS':'Australia','TUR':'Turquía','GER':'Alemania','CUW':'Curazao','CIV':'Costa de Marfil','ECU':'Ecuador','NED':'P. Bajos','JPN':'Japón','SWE':'Suecia','TUN':'Túnez','BEL':'Bélgica','EGY':'Egipto','IRN':'Irán','NZL':'Nueva Zelanda','ESP':'España','CPV':'Cabo Verde','KSA':'Arabia Saudita','URU':'Uruguay','FRA':'Francia','SEN':'Senegal','IRQ':'Irak','NOR':'Noruega','ARG':'Argentina','ALG':'Argelia','AUT':'Austria','JOR':'Jordania','POR':'Portugal','COD':'Congo DR','UZB':'Uzbekistán','COL':'Colombia','ENG':'Inglaterra','CRO':'Croacia','GHA':'Ghana','PAN':'Panamá','CC':'Coca-Cola'};
-const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'Japón','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
+const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴\u200D󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
 const MAX = {'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
 
@@ -538,12 +547,15 @@ window.clearCross = function() {
   document.getElementById('cross-count').textContent='—'; document.getElementById('sync-cross-btn').style.display='none';
 }
 
+// ==========================================
+// CORE DE NEGOCIO INTERACTIVO FIJADO AL 100%
+// ==========================================
 function getHaveCount(p){
   const max = getMax(p);
-  const mSet = new Set(missing[p] || []);
+  const mArr = missing[p] || [];
   let c = 0;
   for(let i = 1; i <= max; i++){
-    if(!mSet.has(i)) c++; 
+    if(!mArr.includes(i)) c++; 
   }
   return c;
 }
@@ -552,7 +564,9 @@ function updateStats(){
   let totalFaltantes=0, totalRepesAbsolutas=0, totalTengoUnicas=0;
   for(const p of PAISES){
     totalFaltantes += (missing[p]||[]).length;
-    if(repeats[p]) totalRepesAbsolutas += Object.values(repeats[p]).reduce((a,b)=>a+b,0);
+    if(repeats[p]) {
+      Object.values(repeats[p]).forEach(cant => { totalRepesAbsolutas += cant; });
+    }
     totalTengoUnicas += getHaveCount(p);
   }
   const pct = Math.round((totalTengoUnicas / TOTAL_FIGUS) * 100);
@@ -573,7 +587,10 @@ window.renderCountries = function() {
   for(const p of PAISES){
     if(search && !p.includes(search) && !NAMES[p].toUpperCase().includes(search)) continue;
     const m = (missing[p]||[]).length;
-    let totalRepes = 0; if(repeats[p]) totalRepes = Object.values(repeats[p]).reduce((a,b)=>a+b,0);
+    let totalRepes = 0; 
+    if(repeats[p]) {
+      Object.values(repeats[p]).forEach(cant => { totalRepes += cant; });
+    }
     
     if(filter==='missing' && m===0) continue;
     if(filter==='complete' && m>0) continue;
@@ -593,7 +610,7 @@ window.renderCountries = function() {
     
     const st = document.createElement('div'); st.className = 'card-stats';
     st.innerHTML = m > 0 ? `<div class="cs-item cs-miss"><i class="ti ti-x"></i>${m}</div>` : `<div class="cs-item cs-ok"><i class="ti ti-check"></i>OK</div>`;
-    card.appendChild(st); card.onclick = () => openModal(p); card.appendChild(st); frag.appendChild(card);
+    card.appendChild(st); card.onclick = () => openModal(p); frag.appendChild(card);
   }
   grid.appendChild(frag); 
   tw(grid); 
@@ -607,11 +624,12 @@ function openModal(p){
 }
 
 function renderModalNumbers() {
-  const p = curPais; const m = new Set(missing[p]||[]); const repObj = repeats[p]||{};
+  const p = curPais; const repObj = repeats[p]||{};
   const grid = document.getElementById('modal-nums'); grid.innerHTML = '';
   
   for(let i=1; i<=getMax(p); i++){
-    const inM = m.has(i); const cantRep = repObj[i]||0; const btn = document.createElement('button'); btn.textContent = i;
+    const inM = missing[p]?.includes(i); const cantRep = repObj[i]||0; 
+    const btn = document.createElement('button'); btn.textContent = i;
     
     if(inM){ btn.className = 'num-btn missing-mark'; } 
     else if(cantRep > 0){
@@ -619,17 +637,38 @@ function renderModalNumbers() {
       const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = cantRep; btn.appendChild(nb);
     } else { btn.className = 'num-btn have-mark'; }
     
+    // CLICK NORMAL (Falta -> Tengo -> Repe)
     btn.onclick = () => {
-      if(missing[p].includes(i)) { missing[p] = missing[p].filter(x => x !== i); }
-      else if(cantRep === 0) { if(!repeats[p]) repeats[p]={}; repeats[p][i]=1; }
-      else { repeats[p][i]++; }
-      syncToCloud(); renderAll(); renderModalNumbers();
+      if(!missing[p]) missing[p] = [];
+      if(!repeats[p]) repeats[p] = {};
+      
+      if(missing[p].includes(i)) { 
+        missing[p] = missing[p].filter(x => x !== i); 
+      }
+      else if(cantRep === 0) { 
+        repeats[p][i] = 1; 
+      }
+      else { 
+        repeats[p][i]++; 
+      }
+      renderModalNumbers(); updateStats(); syncToCloud();
     };
+    
+    // CLICK DERECHO / LONG PRESS (Resta)
     btn.oncontextmenu = (e) => {
       e.preventDefault();
-      if(cantRep > 1) { repeats[p][i]--; } else if(cantRep === 1) { delete repeats[p][i]; }
-      else if(!missing[p].includes(i)) { if(!missing[p]) missing[p]=[]; missing[p].push(i); missing[p].sort((a,b)=>a-b); }
-      syncToCloud(); renderAll(); renderModalNumbers();
+      if(!missing[p]) missing[p] = [];
+      if(!repeats[p]) repeats[p] = {};
+
+      if(cantRep > 1) { 
+        repeats[p][i]--; 
+      } else if(cantRep === 1) { 
+        delete repeats[p][i]; 
+      }
+      else if(!missing[p].includes(i)) { 
+        missing[p].push(i); missing[p].sort((a,b)=>a-b); 
+      }
+      renderModalNumbers(); updateStats(); syncToCloud();
     };
     grid.appendChild(btn);
   }
