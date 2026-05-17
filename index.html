@@ -179,7 +179,6 @@ textarea:focus{border-color:var(--blue);outline:none}
 
 <div class="content">
 
-<!-- ALBUM -->
 <div id="tab-album" class="section active">
   <div class="stats-row">
     <div class="stat-card green">
@@ -215,12 +214,11 @@ textarea:focus{border-color:var(--blue);outline:none}
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Azul = Repetida</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Azul = Cantidad Repes</div>
   </div>
   <div class="country-grid" id="country-grid"></div>
 </div>
 
-<!-- CRUZAR -->
 <div id="tab-cross" class="section">
   <div class="cross-grid">
     <div class="panel">
@@ -245,7 +243,6 @@ textarea:focus{border-color:var(--blue);outline:none}
   </div>
 </div>
 
-<!-- COMPARTIR -->
 <div id="tab-share" class="section">
   <div class="share-grid">
     <div class="share-card">
@@ -287,7 +284,6 @@ textarea:focus{border-color:var(--blue);outline:none}
   </div>
 </div>
 
-<!-- IMPORTAR -->
 <div id="tab-import" class="section">
   <div class="panel">
     <div class="panel-title">Formato completo de la app</div>
@@ -318,7 +314,6 @@ textarea:focus{border-color:var(--blue);outline:none}
 
 </div>
 
-<!-- MODAL -->
 <div id="modal-bg" class="modal-bg" onclick="closeModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-head">
@@ -353,7 +348,9 @@ textarea:focus{border-color:var(--blue);outline:none}
 const TOTAL_FIGUS=994;
 const PAISES=['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
 const NAMES={'FWC':'FIFA WC','MEX':'México','RSA':'Sudáfrica','KOR':'Corea del Sur','CZE':'Rep. Checa','CAN':'Canadá','BIH':'Bosnia','QAT':'Qatar','SUI':'Suiza','BRA':'Brasil','MAR':'Marruecos','HAI':'Haití','SCO':'Escocia','USA':'EE.UU.','PAR':'Paraguay','AUS':'Australia','TUR':'Turquía','GER':'Alemania','CUW':'Curazao','CIV':'Costa de Marfil','ECU':'Ecuador','NED':'P. Bajos','JPN':'Japón','SWE':'Suecia','TUN':'Túnez','BEL':'Bélgica','EGY':'Egipto','IRN':'Irán','NZL':'Nueva Zelanda','ESP':'España','CPV':'Cabo Verde','KSA':'Arabia Saudita','URU':'Uruguay','FRA':'Francia','SEN':'Senegal','IRQ':'Irak','NOR':'Noruega','ARG':'Argentina','ALG':'Argelia','AUT':'Austria','JOR':'Jordania','POR':'Portugal','COD':'Congo DR','UZB':'Uzbekistán','COL':'Colombia','ENG':'Inglaterra','CRO':'Croacia','GHA':'Ghana','PAN':'Panamá','CC':'Coca-Cola'};
-const EMOJI={'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴%9F%8F%B4%F3%A0%81%87%F3%A0%81%82%F3%A0%81%85%F3%A0%81%8E%F3%A0%81%87%F3%A0%81%BF','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴%9F%8F%B4%F3%A0%81%87%F3%A0%81%82%F3%A0%81%85%F3%A0%81%8E%F3%A0%81%87%F3%A0%81%BF','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
+
+// CONFIGURACION DE EMOJIS CORREGIDA PARA EMISORAS DE TEXTO CORROMPIDAS EN SCO Y ENG
+const EMOJI={'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
 const MAX={'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
 
@@ -649,10 +646,7 @@ function renderModalNumbers() {
       btn.className = 'num-btn have-mark';
     }
     
-    // CLICK NORMAL (Suma e incrementa repetidas)
     btn.onclick = () => addOrIncrementFigu(p, i, btn);
-    
-    // CLICK DERECHO / LONG PRESS NATIVO (Resta repetidas o pasa a faltante)
     btn.oncontextmenu = (e) => { 
       e.preventDefault(); 
       decrementOrRemoveFigu(p, i, btn); 
@@ -662,7 +656,6 @@ function renderModalNumbers() {
   }
 }
 
-// LOGICA DE REQUERIMIENTO INTERACTIVO: CLICK INCREMENTAL
 function addOrIncrementFigu(p, n, btn) {
   if(!missing[p]) missing[p]=[];
   if(!repeats[p]) repeats[p]={};
@@ -673,18 +666,15 @@ function addOrIncrementFigu(p, n, btn) {
   const oldBadge = btn.querySelector('.num-btn-badge');
   if(oldBadge) oldBadge.remove();
   
-  // 1. Si estaba como FALTANTE -> Click la pasa a TENGO (Limpio)
   if(inM) {
     missing[p] = missing[p].filter(x => x !== n);
     btn.className = 'num-btn have-mark';
   } 
-  // 2. Si estaba como TENGO -> Click la convierte en REPE x1
   else if(!inM && cantRep === 0) {
     repeats[p][n] = 1;
     btn.className = 'num-btn repeat-mark';
     const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = 1; btn.appendChild(nb);
   } 
-  // 3. Si ya era REPE -> Click le sigue sumando cantidad física real (+1) de forma ilimitada
   else if(cantRep > 0) {
     repeats[p][n] = cantRep + 1;
     btn.className = 'num-btn repeat-mark';
@@ -694,7 +684,6 @@ function addOrIncrementFigu(p, n, btn) {
   save(); updateStats();
 }
 
-// LOGICA DE REQUERIMIENTO INTERACTIVO: CONTEXTMENU / LONG-PRESS DECREMENTAL
 function decrementOrRemoveFigu(p, n, btn) {
   if(!missing[p]) missing[p]=[];
   if(!repeats[p]) repeats[p]={};
@@ -705,18 +694,15 @@ function decrementOrRemoveFigu(p, n, btn) {
   const oldBadge = btn.querySelector('.num-btn-badge');
   if(oldBadge) oldBadge.remove();
   
-  // 1. Si tiene varias repes -> Resta una unidad (Ej: x3 a x2)
   if(cantRep > 1) {
     repeats[p][n] = cantRep - 1;
     btn.className = 'num-btn repeat-mark';
-    const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = repeats[p][n]; btn.appendChild(nb);
+    const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = cantRep - 1; btn.appendChild(nb);
   } 
-  // 2. Si tiene una sola repe (x1) -> La quita de repes y vuelve a TENGO (Limpio)
   else if(cantRep === 1) {
     delete repeats[p][n];
     btn.className = 'num-btn have-mark';
   } 
-  // 3. Si estaba en TENGO -> La quita y la pasa a FALTANTE (Roja)
   else if(!inM && cantRep === 0) {
     missing[p].push(n);
     missing[p].sort((a,b)=>a-b);
