@@ -95,7 +95,6 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .modal-title img{width:24px;height:24px}
 .close-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:16px;cursor:pointer;line-height:1;padding:5px 12px;border-radius:20px;font-weight:700}
 .modal-body{padding:14px}
-.modal-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;font-weight:700;align-items:center}
 
 .num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:10px}
 .num-btn{position:relative;padding:11px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.12s;font-family:'Barlow Condensed',sans-serif;background:var(--bg2);color:var(--text2);touch-action:manipulation;user-select:none}
@@ -160,7 +159,6 @@ textarea:focus{border-color:var(--blue);outline:none}
       <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.8 2.71v2.24h2.92c1.71-1.58 2.68-3.9 2.68-6.58z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.24c-.8.54-1.84.87-3.04.87-2.34 0-4.33-1.58-5.03-3.71H.95v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.74c-.18-.54-.28-1.12-.28-1.74s.1-1.2.28-1.74V4.96H.95A8.99 8.99 0 0 0 0 9c0 1.46.35 2.85.95 4.09l3.02-2.35z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.3A8.99 8.99 0 0 0 9 0 9 9 0 0 0 .95 4.96l3.02 2.35c.7-2.13 2.69-3.73 5.03-3.73z"/></svg>
       Iniciar Sesión con Google
     </button>
-    
     <div id="auth-error" style="color:var(--red);font-size:12px;margin-top:14px;font-weight:700"></div>
   </div>
 </div>
@@ -180,7 +178,7 @@ textarea:focus{border-color:var(--blue);outline:none}
 <div class="tabs">
   <button class="tab active" onclick="showTab('album')">Album</button>
   <button class="tab" onclick="showTab('comu')">Comunidad</button>
-  <button class="tab" onclick="showTab('cross')">Cruzar</button>
+  <button class="tab" onclick="showTab('cross')">Cruzar / Importar</button>
   <button class="tab" onclick="showTab('share')">Compartir</button>
 </div>
 
@@ -224,7 +222,6 @@ textarea:focus{border-color:var(--blue);outline:none}
 <div id="tab-comu" class="section">
   <div class="panel">
     <div class="panel-title">Usuarios en línea</div>
-    <div class="tip" style="margin-bottom:10px">Tocá el botón de cruce en cualquier amigo para ver qué figuritas se pueden cambiar mutuamente en tiempo real sin preguntar.</div>
     <div id="community-users-list">Cargando comunidad...</div>
   </div>
   <div class="panel" id="panel-deal-result" style="display:none">
@@ -247,37 +244,37 @@ textarea:focus{border-color:var(--blue);outline:none}
 
 <div id="tab-cross" class="section">
   <div class="panel">
-    <div class="panel-title">Me ofrecen manualmente</div>
-    <textarea id="cross-input" placeholder="Pegá la lista de alguien que no tenga la app...&#10;FWC: 11&#10;KOR: 4, 8"></textarea>
+    <div class="panel-title">Panel de Carga masiva / Cruce Manual</div>
+    <p style="font-size:11px;color:var(--text2);margin-bottom:8px">Pegá tu lista de WhatsApp acá. Sirve tanto para cruzar la lista de un amigo como para hacer una <b>Importación completa de tus faltantes</b> si querés cargar tu álbum de cero.</p>
+    <textarea id="cross-input" placeholder="Pegá el bloque de texto de WhatsApp acá...&#10;Ejemplo:&#10;ARG: 1, 2, 5, 10&#10;BRA: 4, 18, 20"></textarea>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="doCross()"><i class="ti ti-search"></i> Cruzar</button>
+      <button class="btn btn-primary" onclick="doCross()"><i class="ti ti-arrows-cross"></i> Procesar Texto</button>
       <button class="btn" onclick="clearCross()"><i class="ti ti-trash"></i> Limpiar</button>
     </div>
   </div>
+  
   <div class="panel">
-    <div class="panel-title">Las que te sirven</div>
-    <div class="result-box" id="cross-result">—</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--blue);margin:8px 0" id="cross-count">—</div>
-    <div class="btn-row">
-      <button class="btn btn-success" onclick="syncCrossedFigus()" id="sync-cross-btn" style="display:none"><i class="ti ti-download"></i> Sincronizar a mi Álbum</button>
+    <div class="panel-title">Resultado del análisis</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--blue);margin-bottom:6px" id="cross-count">0 figuritas detectadas</div>
+    <div class="result-box" id="cross-result" style="margin-bottom:12px">—</div>
+    
+    <div class="btn-row" style="gap:10px">
+      <button class="btn btn-success" onclick="syncCrossedFigus()" id="sync-cross-btn" style="display:none; flex:1">
+        <i class="ti ti-download"></i> Marcar como Conseguidas
+      </button>
+      
+      <button class="btn btn-danger" onclick="overwriteMyMissingAlbum()" id="import-overwrite-btn" style="display:none; flex:1">
+        <i class="ti ti-file-import"></i> Forzar como mis Faltantes
+      </button>
     </div>
   </div>
 </div>
 
 <div id="tab-share" class="section">
-  <div class="share-grid">
-    <div class="share-card" onclick="shareAll('missing','copy')">
-      <span class="share-icon-small">❌</span>
-      <div class="share-card-title">Copiar Faltantes</div>
-    </div>
-    <div class="share-card" onclick="shareAll('repeats','copy')">
-      <span class="share-icon-small">🔄</span>
-      <div class="share-card-title">Copiar Repes</div>
-    </div>
-    <div class="share-card" onclick="shareAll('both','copy')" style="border-color:var(--gold)">
-      <span class="share-icon-small">📋</span>
-      <div class="share-card-title">Copiar Todo</div>
-    </div>
+  <div class="share-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;" onclick="shareAll('missing')">❌ Copiar Faltantes</div>
+    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;" onclick="shareAll('repeats')">🔄 Copiar Repes</div>
+    <div class="panel" style="text-align:center;cursor:pointer;padding:10px;border-color:var(--gold)" onclick="shareAll('both')">📋 Copiar Todo</div>
   </div>
   <div class="panel">
     <div class="panel-title">Vista previa de tus listas de texto</div>
@@ -302,10 +299,6 @@ textarea:focus{border-color:var(--blue);outline:none}
     </div>
     <div class="modal-body">
       <div class="num-grid" id="modal-nums"></div>
-      <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center;line-height:1.4">
-        👉 <b>Click normal:</b> Falta ➔ Tengo ➔ Sumar Repes (+1)<br>
-        👉 <b>Mantené apretado / Click derecho:</b> Restar Repes ➔ Tengo ➔ Falta
-      </div>
     </div>
   </div>
 </div>
@@ -336,6 +329,8 @@ let missing = {};
 let repeats = {};
 let globalUsersDatabase = {};
 let lastCrossedMatches = [];
+let lastParsedResultRaw = {}; 
+let curPreview = 'missing';
 
 const TOTAL_FIGUS = 994;
 const PAISES = ['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
@@ -344,51 +339,45 @@ const EMOJI = {'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','
 const MAX = {'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
 
-// LOGIN POPUP CON GOOGLE
 window.loginWithGoogle = async function() {
   const errDiv = document.getElementById('auth-error');
   errDiv.textContent = "";
   try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    
-    // Si es un usuario nuevo, le inicializamos la base de datos con su nombre de Google
-    const userRef = doc(db, "users", user.uid);
-    const userDoc = await getDoc(userRef);
-    
-    if (!userDoc.exists()) {
-      const initialMissing = {};
-      PAISES.forEach(p => {
-        initialMissing[p] = [];
-        for(let i=1; i<=getMax(p); i++) initialMissing[p].push(i);
-      });
-      await setDoc(userRef, {
-        name: user.displayName || "Amigo",
-        email: user.email,
-        missing: initialMissing,
-        repeats: {}
-      });
-    }
-  } catch (e) {
-    errDiv.textContent = "Error al conectar con Google: " + e.message;
-  }
+    await signInWithPopup(auth, provider);
+  } catch (e) { errDiv.textContent = "Error al conectar con Google: " + e.message; }
 }
 
-window.logout = function() {
-  signOut(auth);
-}
+window.logout = function() { signOut(auth); }
 
 onAuthStateChanged(auth, async (user) => {
   if(user) {
     currentUser = user;
     document.getElementById('auth-screen').style.display = 'none';
     
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    if(userDoc.exists()) {
+    const userRef = doc(db, "users", user.uid);
+    const userDoc = await getDoc(userRef);
+    
+    if (userDoc.exists()) {
       const data = userDoc.data();
       missing = data.missing || {};
       repeats = data.repeats || {};
-      document.getElementById('header-user-sub').textContent = `HOLA, ${data.name.toUpperCase()}!`;
+      document.getElementById('header-user-sub').textContent = `HOLA, ${(data.name || "AMIGO").toUpperCase()}!`;
+    } else {
+      // Setup inicial limpio
+      const initialMissing = {};
+      PAISES.forEach(p => {
+        initialMissing[p] = [];
+        for(let i=1; i<=getMax(p); i++) initialMissing[p].push(i);
+      });
+      missing = initialMissing;
+      repeats = {};
+      await setDoc(userRef, {
+        name: user.displayName || "Amigo",
+        email: user.email,
+        missing: missing,
+        repeats: repeats
+      });
+      document.getElementById('header-user-sub').textContent = `HOLA, ${(user.displayName || "AMIGO").toUpperCase()}!`;
     }
     renderAll();
     listenCommunityChannels();
@@ -405,7 +394,7 @@ async function syncToCloud() {
       missing: missing,
       repeats: repeats
     }, { merge: true });
-  } catch(e) { console.error("Error sincronizando:", e); }
+  } catch(e) { console.error("Error al sincronizar:", e); }
 }
 
 function listenCommunityChannels() {
@@ -413,14 +402,12 @@ function listenCommunityChannels() {
     const listDiv = document.getElementById('community-users-list');
     listDiv.innerHTML = "";
     globalUsersDatabase = {};
-
     snapshot.forEach(docSnap => {
       const id = docSnap.id;
       const uData = docSnap.data();
       globalUsersDatabase[id] = uData;
-
       if(currentUser && id === currentUser.uid) return;
-
+      
       let coreHave = 0;
       PAISES.forEach(p => {
         const mSet = new Set(uData.missing?.[p] || []);
@@ -432,7 +419,7 @@ function listenCommunityChannels() {
       row.className = 'user-row-card';
       row.innerHTML = `
         <div>
-          <div class="user-info-name">${uData.name}</div>
+          <div class="user-info-name">${uData.name || "Amigo anónimo"}</div>
           <div class="user-info-pct">Progreso: ${pct}%</div>
         </div>
         <button class="btn btn-primary" style="padding:6px 12px; font-size:12px;"><i class="ti ti-arrows-cross"></i> Ver Cruce</button>
@@ -447,7 +434,6 @@ function listenCommunityChannels() {
 function calculateLiveCrossDeal(friendId) {
   const friend = globalUsersDatabase[friendId];
   if(!friend) return;
-
   const youGiveMatches = [];
   const heGivesMatches = [];
 
@@ -458,7 +444,6 @@ function calculateLiveCrossDeal(friendId) {
       if(myM.includes(n) && repObj[nStr] > 0) heGivesMatches.push(`${p}${n}`);
     });
   }
-
   for(const [p, repObj] of Object.entries(repeats)) {
     const friendM = friend.missing?.[p] || [];
     Object.keys(repObj).forEach(nStr => {
@@ -466,13 +451,10 @@ function calculateLiveCrossDeal(friendId) {
       if(friendM.includes(n) && repObj[nStr] > 0) youGiveMatches.push(`${p}${n}`);
     });
   }
-
   document.getElementById('panel-deal-result').style.display = 'block';
   document.getElementById('deal-title').textContent = `Intercambio óptimo con ${friend.name}`;
-  
   const hgBox = document.getElementById('deal-he-gives');
   const ygBox = document.getElementById('deal-you-give');
-
   hgBox.textContent = heGivesMatches.length > 0 ? heGivesMatches.join(', ') : "Ninguna :(";
   ygBox.textContent = youGiveMatches.length > 0 ? youGiveMatches.join(', ') : "Ninguna :(";
 
@@ -481,8 +463,110 @@ function calculateLiveCrossDeal(friendId) {
     const text = `⚽ *¡Hola ${friend.name}! Cruzando nuestro panel de figus vi que podemos cambiar:* \n\n➕ *Me das:* ${hgBox.textContent}\n➖ *Te doy:* ${ygBox.textContent}\n\n¿Cambiamos? 🤝`;
     window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
   };
-  
   document.getElementById('panel-deal-result').scrollIntoView({ behavior: 'smooth' });
+}
+
+// PARSEADOR MEJORADO
+function parseText(text){
+  const result={};
+  for(const raw of text.split('\n')){
+    const line=raw.trim();
+    if(!line||/^(figuritas app|usa méx|me faltan|repetidas|descarga|https?:)/i.test(line))continue;
+    const hm=line.match(/^#([A-Z]{2,4})(\d+)/i);
+    if(hm){
+      const p=hm[1].toUpperCase(),n=parseInt(hm[2]);
+      if(PAISES.includes(p)&&n>0){if(!result[p])result[p]=[];result[p].push(n);}
+      continue;
+    }
+    const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d]/g,' ').trim();
+    const m=s.match(/^([A-Z]{2,4})\b[^:]*:\s*([\d,\s]+)/i);
+    if(m){
+      const p=m[1].toUpperCase();
+      if(PAISES.includes(p)){
+        const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
+        if(nums.length){if(!result[p])result[p]=[];result[p]=[...new Set([...result[p],...nums])].sort((a,b)=>a-b);}
+      }
+    }
+  }
+  return result;
+}
+
+window.doCross = function() {
+  const textVal = document.getElementById('cross-input').value;
+  const offered = parseText(textVal);
+  lastParsedResultRaw = offered; 
+  lastCrossedMatches = [];
+  
+  let totalDetectadas = 0;
+  for(const [p,nums] of Object.entries(offered)){
+    totalDetectadas += nums.length;
+    const myM = missing[p]||[];
+    for(const n of nums) if(myM.includes(n)) lastCrossedMatches.push({pais:p, numero:n});
+  }
+  
+  document.getElementById('cross-count').textContent = `${totalDetectadas} figuritas procesadas`;
+  const res = document.getElementById('cross-result');
+  
+  if(totalDetectadas === 0) {
+    res.textContent = 'No se detectó ningún formato válido. Asegurate de que empiece con el código (ej: ARG: 1, 2, 3)';
+    document.getElementById('sync-cross-btn').style.display='none';
+    document.getElementById('import-overwrite-btn').style.display='none';
+    return;
+  }
+
+  // Si detectó datos, habilita opciones
+  res.innerHTML = `<b>Lista interpretada:</b><br>` + Object.entries(offered).map(([p,nums])=>`<b>${p}:</b> ${nums.join(', ')}`).join('<br>');
+  
+  // Mostrar botón de cruce si coinciden con tus faltantes actuales
+  if(lastCrossedMatches.length > 0) {
+    document.getElementById('sync-cross-btn').style.display='inline-flex';
+    document.getElementById('sync-cross-btn').innerHTML = `<i class="ti ti-download"></i> Conseguí ${lastCrossedMatches.length} de esta lista`;
+  } else {
+    document.getElementById('sync-cross-btn').style.display='none';
+  }
+  
+  // Siempre habilitar el botón de Importación Completa (Sobrescribir tus faltantes)
+  document.getElementById('import-overwrite-btn').style.display='inline-flex';
+}
+
+// IMPORTANTE: FUNCIÓN DE IMPORTACIÓN PARA CARGAR TU ÁLBUM
+window.overwriteMyMissingAlbum = function() {
+  if(Object.keys(lastParsedResultRaw).length === 0) return;
+  if(!confirm("⚠️ ¿Estás seguro de que querés configurar esta lista como TUS PROPIAS FALTANTES? Esto reemplazará tu configuración actual en el sistema.")) return;
+  
+  // Inicializamos todo vacío y solo guardamos lo que se parseó
+  const newMissing = {};
+  PAISES.forEach(p => {
+    newMissing[p] = lastParsedResultRaw[p] || []; // Guarda las que faltan pasadas por texto, si no vino ninguna queda en 0
+  });
+  
+  missing = newMissing;
+  syncToCloud();
+  renderAll();
+  showToast("¡Álbum cargado e importado!");
+  clearCross();
+}
+
+window.syncCrossedFigus = function() {
+  lastCrossedMatches.forEach(item => {
+    if(missing[item.pais]) missing[item.pais] = missing[item.pais].filter(x => x !== item.numero);
+  });
+  syncToCloud(); renderAll(); showToast("¡Sincronizadas al álbum!"); clearCross();
+}
+
+window.clearCross = function() {
+  document.getElementById('cross-input').value=''; document.getElementById('cross-result').textContent='—';
+  document.getElementById('cross-count').textContent='0 figuritas detectadas'; 
+  document.getElementById('sync-cross-btn').style.display='none';
+  document.getElementById('import-overwrite-btn').style.display='none';
+}
+
+// RENDER Y LOGICA VISUAL
+function getHaveCount(p){
+  const mSet = new Set(missing[p]||[]);
+  let count = 0;
+  for(let i=1; i<=getMax(p); i++) if(!mSet.has(i)) count++;
+  return count;
 }
 
 function updateStats(){
@@ -510,7 +594,6 @@ window.renderCountries = function() {
   
   for(const p of PAISES){
     if(search && !p.includes(search) && !NAMES[p].toUpperCase().includes(search)) continue;
-    
     const m = (missing[p]||[]).length;
     let totalRepes = 0;
     if(repeats[p]) totalRepes = Object.values(repeats[p]).reduce((a,b)=>a+b,0);
@@ -536,28 +619,21 @@ window.renderCountries = function() {
     flagRow.appendChild(nm); card.appendChild(flagRow);
     
     const st = document.createElement('div'); st.className = 'card-stats';
-    if(m > 0){
-      st.innerHTML = `<div class="cs-item cs-miss"><i class="ti ti-x" style="font-size:11px"></i>${m}</div>`;
-    } else {
-      st.innerHTML = `<div class="cs-item cs-ok"><i class="ti ti-check" style="font-size:11px"></i>OK</div>`;
-    }
+    st.innerHTML = m > 0 ? `<div class="cs-item cs-miss"><i class="ti ti-x"></i>${m}</div>` : `<div class="cs-item cs-ok"><i class="ti ti-check"></i>OK</div>`;
     card.appendChild(st);
     card.onclick = () => openModal(p);
     frag.appendChild(card);
   }
   grid.appendChild(frag);
-  tw(grid);
 }
 
 let curPais = '';
 function openModal(p){
   curPais = p;
-  const fs = document.getElementById('modal-flag-span');
-  fs.textContent = EMOJI[p]||''; fs.style.fontSize = '22px';
+  document.getElementById('modal-flag-span').textContent = EMOJI[p]||'';
   document.getElementById('modal-name').textContent = ' ' + p + ' — ' + NAMES[p];
   renderModalNumbers();
   document.getElementById('modal-bg').classList.add('open');
-  document.body.style.overflow = 'hidden';
 }
 
 function renderModalNumbers() {
@@ -579,53 +655,26 @@ function renderModalNumbers() {
       const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = cantRep; btn.appendChild(nb);
     } else { btn.className = 'num-btn have-mark'; }
     
-    btn.onclick = () => addOrIncrementFigu(p, i, btn);
-    btn.oncontextmenu = (e) => { e.preventDefault(); decrementOrRemoveFigu(p, i, btn); };
+    btn.onclick = () => {
+      if(m.has(i)) { missing[p] = missing[p].filter(x => x !== i); }
+      else if(cantRep === 0) { if(!repeats[p]) repeats[p]={}; repeats[p][i]=1; }
+      else { repeats[p][i]++; }
+      syncToCloud(); renderAll(); renderModalNumbers();
+    };
+    btn.oncontextmenu = (e) => {
+      e.preventDefault();
+      if(cantRep > 1) { repeats[p][i]--; }
+      else if(cantRep === 1) { delete repeats[p][i]; }
+      else if(!inM) { if(!missing[p]) missing[p]=[]; missing[p].push(i); missing[p].sort((a,b)=>a-b); }
+      syncToCloud(); renderAll(); renderModalNumbers();
+    };
     grid.appendChild(btn);
   }
-}
-
-function addOrIncrementFigu(p, n, btn) {
-  if(!missing[p]) missing[p] = [];
-  if(!repeats[p]) repeats[p] = {};
-  const inM = missing[p].includes(n);
-  const cantRep = repeats[p][n]||0;
-  
-  if(inM) {
-    missing[p] = missing[p].filter(x => x !== n); btn.className = 'num-btn have-mark';
-  } else if(!inM && cantRep === 0) {
-    repeats[p][n] = 1; btn.className = 'num-btn repeat-mark';
-    const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = 1; btn.appendChild(nb);
-  } else if(cantRep > 0) {
-    repeats[p][n] = cantRep + 1;
-    const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = repeats[p][n]; btn.appendChild(nb);
-  }
-  updateStats(); syncToCloud();
-}
-
-function decrementOrRemoveFigu(p, n, btn) {
-  if(!missing[p]) missing[p] = [];
-  if(!repeats[p]) repeats[p] = {};
-  const inM = missing[p].includes(n);
-  const cantRep = repeats[p][n]||0;
-  
-  const oldB = btn.querySelector('.num-btn-badge'); if(oldB) oldB.remove();
-  
-  if(cantRep > 1) {
-    repeats[p][n] = cantRep - 1;
-    const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = repeats[p][n]; btn.appendChild(nb);
-  } else if(cantRep === 1) {
-    delete repeats[p][n]; btn.className = 'num-btn have-mark';
-  } else if(!inM && cantRep === 0) {
-    missing[p].push(n); missing[p].sort((a,b)=>a-b); btn.className = 'num-btn missing-mark';
-  }
-  updateStats(); syncToCloud();
 }
 
 window.closeModal = function(e){
   if(!e || e.target === document.getElementById('modal-bg')){
     document.getElementById('modal-bg').classList.remove('open');
-    document.body.style.overflow = '';
     renderCountries();
   }
 }
@@ -640,18 +689,13 @@ window.showTab = function(t) {
 
 window.setPreview = function(t) {
   curPreview = t;
-  document.getElementById('share-preview-box').textContent = t==='missing' ? buildText('missing') : buildText('repeats');
+  document.getElementById('share-preview-box').textContent = buildText(t);
   document.getElementById('pt-missing').classList.toggle('active', t==='missing');
   document.getElementById('pt-repeats').classList.toggle('active', t==='repeats');
 }
 
-function showToast(msg){
-  const el = document.getElementById('toast'); el.textContent = msg; el.style.opacity = '1';
-  setTimeout(()=>el.style.opacity='0', 1800);
-}
-
 function buildText(type){
-  const hdr = type==='missing'?'Me faltan':'Repetidas';
+  const hdr = type=='missing'?'Me faltan':'Repetidas';
   const lines = [`⚽ *Figus Panini - FIFA World Cup 2026*`,`*${hdr}*`,''];
   for(const p of PAISES){
     if(type==='missing'){
@@ -665,62 +709,13 @@ function buildText(type){
   return lines.join('\n');
 }
 
-window.shareAll = function(type, mode) {
-  const txt = buildText(type);
-  navigator.clipboard.writeText(txt).then(()=>showToast("¡Copiado al portapapeles!")).catch(()=>{});
+window.shareAll = function(type) {
+  navigator.clipboard.writeText(buildText(type)).then(()=>showToast("¡Copiado al portapapeles!"));
 }
 
-// PARSEADORES DE TEXTO INTEGRADOS Y SEGUROS CON EL NUEVO ENTORNO MODULE
-function parseText(text){
-  const result={};
-  for(const raw of text.split('\n')){
-    const line=raw.trim();
-    if(!line||/^(figuritas app|usa méx|me faltan|repetidas|descarga|https?:)/i.test(line))continue;
-    const hm=line.match(/^#([A-Z]{2,4})(\d+)/i);
-    if(hm){
-      const p=hm[1].toUpperCase(),n=parseInt(hm[2]);
-      if(PAISES.includes(p)&&n>0){if(!result[p])result[p]=[];result[p].push(n);}
-      continue;
-    }
-    const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d]/g,' ').trim();
-    const m=s.match(/^([A-Z]{2,4})\b[^:]*:\s*([\d,\s]+)/i);
-    if(m){
-      const p=m[1].toUpperCase();
-      if(PAISES.includes(p)){
-        const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
-        if(nums.length){if(!result[p])result[p]=[];result[p]=[...new Set([...result[p],...nums])].sort((a,b)=>a-b);}
-      }
-    }
-  }
-  return result;
-}
-
-window.doCross = function() {
-  const offered = parseText(document.getElementById('cross-input').value);
-  lastCrossedMatches = [];
-  for(const [p,nums] of Object.entries(offered)){
-    const myM = missing[p]||[];
-    for(const n of nums) if(myM.includes(n)) lastCrossedMatches.push({pais:p, numero:n});
-  }
-  const res = document.getElementById('cross-result');
-  document.getElementById('cross-count').textContent = lastCrossedMatches.length + ' figuritas coinciden';
-  if(!lastCrossedMatches.length) {
-    res.textContent = 'Ninguna coincide :('; document.getElementById('sync-cross-btn').style.display='none'; return;
-  }
-  res.textContent = lastCrossedMatches.map(m=>`${m.pais}${m.numero}`).join(', ');
-  document.getElementById('sync-cross-btn').style.display='inline-flex';
-}
-
-window.syncCrossedFigus = function() {
-  lastCrossedMatches.forEach(item => {
-    if(missing[item.pais]) missing[item.pais] = missing[item.pais].filter(x => x !== item.numero);
-  });
-  syncToCloud(); renderAll(); showToast("¡Sincronizadas al álbum!"); clearCross();
-}
-
-window.clearCross = function() {
-  document.getElementById('cross-input').value=''; document.getElementById('cross-result').textContent='—';
-  document.getElementById('cross-count').textContent='—'; document.getElementById('sync-cross-btn').style.display='none';
+function showToast(msg){
+  const el = document.getElementById('toast'); el.textContent = msg; el.style.opacity = '1';
+  setTimeout(()=>el.style.opacity='0', 1800);
 }
 
 function renderAll(){ renderCountries(); updateStats(); }
