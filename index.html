@@ -225,7 +225,7 @@ textarea:focus{border-color:var(--blue);outline:none}
   <div id="tab-cross" class="section">
     <div class="panel">
       <div class="panel-title">Me ofrecen</div>
-      <div class="tip">Acepta los 3 formatos: Figuritas App, Album Master, o WhatsApp #CODE.</div>
+      <div class="tip">Acepta todos los formatos: Figuritas App, Album Master, WhatsApp con #CODE.</div>
       <textarea id="cross-input" placeholder="* #FWC5 (x1)&#10;* #MEX9 (x1)&#10;&#10;o&#10;&#10;🇲🇽 MEX: 4, 5, 7&#10;🇧🇷 BRA: 2, 3"></textarea>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="doCross()"><i class="ti ti-search"></i> Cruzar</button>
@@ -288,12 +288,14 @@ textarea:focus{border-color:var(--blue);outline:none}
     <div class="panel">
       <div class="panel-title">Importar álbum</div>
       <div class="tip">
-        Detecta automáticamente 3 formatos:<br>
-        • <b>Figuritas App</b> — secciones "Me faltan" / "Repetidas"<br>
-        • <b>Album Master</b> — secciones "❌ ME FALTAN" / "🔁 REPETIDAS"<br>
-        • <b>WhatsApp</b> — líneas "#CODE123 (xN)" (solo repetidas, conserva faltantes actuales)
+        Detecta automáticamente el formato y qué pisar:<br>
+        • <b>Figuritas App</b> — "Me faltan" / "Repetidas"<br>
+        • <b>Album Master</b> — "❌ ME FALTAN" / "🔁 REPETIDAS"<br>
+        • <b>WhatsApp faltantes</b> — header "FALTAN" + líneas #CODE (pisa solo faltantes)<br>
+        • <b>WhatsApp repetidas</b> — header "REPETIDAS" + líneas #CODE (xN) (pisa solo repetidas)<br>
+        • Podés pegar las dos listas juntas y detecta ambas.
       </div>
-      <textarea id="import-full" style="min-height:160px" placeholder="Pegá acá cualquiera de los 3 formatos..."></textarea>
+      <textarea id="import-full" style="min-height:160px" placeholder="Pegá acá cualquiera de los formatos..."></textarea>
       <div class="btn-row">
         <button class="btn btn-primary btn-block" onclick="importFull()">
           <i class="ti ti-cloud-upload"></i> Cargar y guardar en la nube
@@ -318,7 +320,7 @@ textarea:focus{border-color:var(--blue);outline:none}
       <div class="modal-legend">
         <span><span class="ld" style="background:#81c784"></span>Tengo</span>
         <span><span class="ld" style="background:#e57373"></span>Falta</span>
-        <span><span class="ld" style="background:#93c5fd"></span>Repetida (badge = cantidad)</span>
+        <span><span class="ld" style="background:#93c5fd"></span>Repetida</span>
       </div>
       <div class="num-grid" id="modal-nums"></div>
       <div class="modal-hint">Tap: tengo→falta→repe→+repe &nbsp;|&nbsp; Tap largo: restar</div>
@@ -361,13 +363,13 @@ const MAX_NUM = {'FWC':19,'CC':14};
 function getMax(p){ return MAX_NUM[p]||20; }
 
 let currentUser = null;
-let missing = {};   // { PAI: [1,2,3] }
-let repeats = {};   // { PAI: { "1": cant, "2": cant } }
+let missing = {};
+let repeats = {};
 let globalUsersDB = {};
 let curPais = '';
 let curPreviewType = 'missing';
 
-// ── Auth ────────────────────────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────────────────
 window.loginWithGoogle = async () => {
   document.getElementById('auth-error').textContent = '';
   try { await signInWithPopup(auth, provider); }
@@ -385,7 +387,6 @@ onAuthStateChanged(auth, user => {
         const d = snap.data();
         missing = d.missing || {};
         repeats = d.repeats || {};
-        // ensure structure
         for (const p of PAISES) {
           if (!Array.isArray(missing[p])) missing[p] = [];
           if (!repeats[p] || Array.isArray(repeats[p])) repeats[p] = {};
@@ -412,7 +413,7 @@ async function syncToCloud() {
   } catch(e) { console.error('sync error', e); }
 }
 
-// ── Community ────────────────────────────────────────────────────────
+// ── Community ─────────────────────────────────────────────────────────
 function listenCommunity() {
   onSnapshot(collection(db, 'users'), snap => {
     globalUsersDB = {};
@@ -472,7 +473,7 @@ function calcDeal(friendId) {
   document.getElementById('panel-deal-result').scrollIntoView({behavior:'smooth'});
 }
 
-// ── Universal Parser ────────────────────────────────────────────────
+// ── Universal Parser ──────────────────────────────────────────────────
 function stripEmojis(str) {
   return str
     .replace(/[\u{1F1E0}-\u{1F1FF}]{1,2}/gu,'')
@@ -490,42 +491,83 @@ function parseUniversal(text) {
   const rep = {};
   for (const p of PAISES) { mis[p] = []; rep[p] = {}; }
 
-  const isHash        = /\*?\s*#[A-Z]{2,4}\d+\s*\(x?\d+\)/i.test(text);
-  const isAlbumMaster = /album master/i.test(text) || /ME FALTAN/u.test(text);
-  const isFiguApp     = !isAlbumMaster && (/me faltan/i.test(text) || /^repetidas/im.test(text) || /figuritas app/i.test(text));
+  // Detectar si hay líneas tipo #CODE (con o sin cantidad)
+  const hasHashLines = /\*?\s*#[A-Z]{2,4}0*\d+/i.test(text);
+  const isAlbumMaster = !hasHashLines && (/album master/i.test(text) || /ME FALTAN/u.test(text));
+  const isFiguApp = !hasHashLines && !isAlbumMaster &&
+    (/me faltan/i.test(text) || /^repetidas/im.test(text) || /figuritas app/i.test(text));
 
-  // ── FORMATO 2: WhatsApp #CODE ─────────────────────────────────────
-  if (isHash) {
+  // ── FORMATO WhatsApp #CODE (faltantes y/o repetidas) ────────────────
+  if (hasHashLines) {
+    let mode = null;
+
     for (const raw of text.split('\n')) {
-      const m = raw.match(/#([A-Z]{2,4})0*(\d+)\s*\(x?(\d+)\)/i);
-      if (m) {
-        const p    = m[1].toUpperCase();
-        const n    = parseInt(m[2]);
-        const cant = parseInt(m[3])||1;
-        if (PAISES.includes(p) && n > 0) rep[p][n] = (rep[p][n]||0) + cant;
+      const line = raw.trim();
+      if (!line) continue;
+
+      // Detectar header de sección por palabras clave
+      // Header de faltantes: "FIGURITAS QUE ME FALTAN" o "ME FALTAN"
+      // Header de repetidas: "FIGURITAS REPETIDAS" o "REPETIDAS PARA CAMBIO"
+      if (!line.startsWith('#') && !line.startsWith('*\u00a0#') && !line.match(/^\*\s*#/)) {
+        if (/FALTAN/i.test(line) && !/play\.google|apps\.apple/i.test(line)) {
+          mode = 'missing'; continue;
+        }
+        if (/REPETIDAS/i.test(line) && !/play\.google|apps\.apple/i.test(line)) {
+          mode = 'repeats'; continue;
+        }
+        // skip noise lines
+        if (/ayúdame|cuáles te faltan|play\.google|apps\.apple|https?:/i.test(line)) continue;
+      }
+
+      // Línea con cantidad → repetida: * #CODE123 (x2)
+      const mRep = line.match(/#([A-Z]{2,4})0*(\d+)\s*\(x?(\d+)\)/i);
+      if (mRep) {
+        const p    = mRep[1].toUpperCase();
+        const n    = parseInt(mRep[2]);
+        const cant = parseInt(mRep[3]) || 1;
+        if (PAISES.includes(p) && n > 0) {
+          // Si el modo es 'missing' explícito pero tiene (xN), igual va a repeats
+          rep[p][n] = (rep[p][n] || 0) + cant;
+        }
+        continue;
+      }
+
+      // Línea sin cantidad → depende del modo detectado
+      const mCode = line.match(/#([A-Z]{2,4})0*(\d+)\s*$/i);
+      if (mCode) {
+        const p = mCode[1].toUpperCase();
+        const n = parseInt(mCode[2]);
+        if (PAISES.includes(p) && n > 0) {
+          if (mode === 'repeats') {
+            rep[p][n] = (rep[p][n] || 0) + 1;
+          } else {
+            // 'missing' o sin modo detectado → faltante
+            mis[p].push(n);
+          }
+        }
       }
     }
+
+    for (const p of PAISES) mis[p] = [...new Set(mis[p])].sort((a,b)=>a-b);
     return { missing: mis, repeats: rep, fmt: 'WhatsApp #CODE' };
   }
 
-  // ── FORMATO 1: Album Master ───────────────────────────────────────
+  // ── FORMATO Album Master ─────────────────────────────────────────────
   if (isAlbumMaster) {
     let mode = null;
     for (const raw of text.split('\n')) {
       const line = raw.trim(); if (!line) continue;
-      if (/ME FALTAN/i.test(line))  { mode='missing'; continue; }
-      if (/REPETIDAS/i.test(line))  { mode='repeats'; continue; }
+      if (/ME FALTAN/i.test(line))  { mode = 'missing'; continue; }
+      if (/REPETIDAS/i.test(line))  { mode = 'repeats'; continue; }
       if (!mode) continue;
       const stripped = stripEmojis(line);
       const m = stripped.match(/^([A-Z]{2,4})\s*:\s*(.+)/i);
       if (!m) continue;
-      const p = m[1].toUpperCase();
-      if (!PAISES.includes(p)) continue;
+      const p = m[1].toUpperCase(); if (!PAISES.includes(p)) continue;
       for (const token of m[2].split(/[\s,]+/)) {
         const tm = token.match(/^(\d+)(?:\(x?(\d+)\))?/i);
         if (!tm) continue;
-        const n    = parseInt(tm[1]);
-        const cant = parseInt(tm[2]||'1');
+        const n = parseInt(tm[1]), cant = parseInt(tm[2]||'1');
         if (isNaN(n)||n<=0) continue;
         if (mode==='missing') mis[p].push(n);
         else rep[p][n] = (rep[p][n]||0) + cant;
@@ -535,26 +577,23 @@ function parseUniversal(text) {
     return { missing: mis, repeats: rep, fmt: 'Album Master' };
   }
 
-  // ── FORMATO 3: Figuritas App ──────────────────────────────────────
+  // ── FORMATO Figuritas App ────────────────────────────────────────────
   if (isFiguApp) {
     let mode = null;
     for (const raw of text.split('\n')) {
       const line = raw.trim(); if (!line) continue;
-      if (/^me faltan/i.test(line))  { mode='missing'; continue; }
-      if (/^repetidas/i.test(line))  { mode='repeats'; continue; }
-      if (/^(figuritas app|usa méx|descarga|https?:)/i.test(line)) { mode=null; continue; }
+      if (/^me faltan/i.test(line))  { mode = 'missing'; continue; }
+      if (/^repetidas/i.test(line))  { mode = 'repeats'; continue; }
+      if (/^(figuritas app|usa méx|descarga|https?:)/i.test(line)) { mode = null; continue; }
       if (!mode) continue;
       const stripped = stripEmojis(line);
-      // FWC 🏆:, FWC 🌎:, FWC 📜: all become "FWC :" after strip
       const m = stripped.match(/^([A-Z]{2,4})\s*:\s*(.+)/i);
       if (!m) continue;
-      const p = m[1].toUpperCase();
-      if (!PAISES.includes(p)) continue;
+      const p = m[1].toUpperCase(); if (!PAISES.includes(p)) continue;
       for (const token of m[2].split(/[\s,]+/)) {
         const tm = token.match(/^(\d+)(?:\(x?(\d+)\))?/i);
         if (!tm) continue;
-        const n    = parseInt(tm[1]);
-        const cant = parseInt(tm[2]||'1');
+        const n = parseInt(tm[1]), cant = parseInt(tm[2]||'1');
         if (isNaN(n)||n<=0) continue;
         if (mode==='missing') mis[p].push(n);
         else rep[p][n] = (rep[p][n]||0) + cant;
@@ -567,7 +606,7 @@ function parseUniversal(text) {
   return { missing: mis, repeats: rep, fmt: 'Desconocido' };
 }
 
-// ── Import ───────────────────────────────────────────────────────────
+// ── Import ────────────────────────────────────────────────────────────
 window.importFull = async () => {
   const text   = document.getElementById('import-full').value.trim();
   const status = document.getElementById('import-status');
@@ -582,38 +621,35 @@ window.importFull = async () => {
   }
 
   const { missing: newMis, repeats: newRep, fmt } = parseUniversal(text);
-  const totalMis = PAISES.reduce((a,p)=>a+newMis[p].length, 0);
-  const totalRep = PAISES.reduce((a,p)=>a+Object.values(newRep[p]||{}).reduce((x,y)=>x+y,0), 0);
+  const totalMis = PAISES.reduce((a,p) => a + newMis[p].length, 0);
+  const totalRep = PAISES.reduce((a,p) => a + Object.values(newRep[p]||{}).reduce((x,y)=>x+y,0), 0);
 
-  if (totalMis===0 && totalRep===0) {
+  if (totalMis === 0 && totalRep === 0) {
     status.className = 'status-err';
-    status.textContent = `⚠️ No se encontraron datos (formato detectado: ${fmt}). Verificá el texto pegado.`;
+    status.textContent = `⚠️ No se encontraron datos (formato: ${fmt}). Verificá el texto pegado.`;
     return;
   }
 
-  if (fmt === 'WhatsApp #CODE') {
-    // Only update repeats, keep existing missing
-    for (const p of PAISES) {
-      if (!repeats[p]) repeats[p] = {};
-      for (const [n, cant] of Object.entries(newRep[p]||{})) {
-        repeats[p][n] = cant;
-      }
-    }
-  } else {
-    missing = newMis;
-    repeats = newRep;
+  // Decidir qué pisar según qué vino en el texto
+  const hasMissing = PAISES.some(p => newMis[p].length > 0);
+  const hasRepeats = PAISES.some(p => Object.keys(newRep[p]||{}).length > 0);
+
+  if (hasMissing) missing = newMis;
+  if (hasRepeats) {
+    for (const p of PAISES) repeats[p] = { ...(newRep[p]||{}) };
   }
 
   status.textContent = 'Guardando en la nube...';
   await syncToCloud();
 
+  const pisado = hasMissing && hasRepeats ? 'Faltantes y Repetidas' : hasMissing ? 'Faltantes' : 'Repetidas';
   status.className = 'status-ok';
-  status.innerHTML = `✓ Importado desde <b>${fmt}</b><br><span style="font-size:12px;font-weight:normal">Faltantes: <b>${totalMis}</b> · Repetidas (unidades): <b>${totalRep}</b></span>`;
+  status.innerHTML = `✓ <b>${fmt}</b> — Pisado: <b>${pisado}</b><br><span style="font-size:12px;font-weight:normal">Faltantes: <b>${totalMis}</b> · Repetidas (unidades): <b>${totalRep}</b></span>`;
   showToast('¡ÁLBUM ACTUALIZADO!');
   renderAll();
 };
 
-// ── Render ───────────────────────────────────────────────────────────
+// ── Render ────────────────────────────────────────────────────────────
 function renderAll() { renderCountries(); updateStats(); }
 
 function updateStats() {
@@ -651,7 +687,6 @@ window.renderCountries = () => {
 
     const card = document.createElement('div');
     card.className = 'country-card '+(mCount>0?'has-missing':'complete');
-
     if (rTotal>0) {
       const rb = document.createElement('div'); rb.className='badge-repeats'; rb.textContent=rTotal;
       card.appendChild(rb);
@@ -662,7 +697,6 @@ window.renderCountries = () => {
     fc.appendChild(fs); flagRow.appendChild(fc);
     const nm = document.createElement('div'); nm.className='country-code'; nm.textContent=p;
     flagRow.appendChild(nm); card.appendChild(flagRow);
-
     const st = document.createElement('div'); st.className='card-stats';
     if (mCount>0) {
       const pill=document.createElement('div'); pill.className='cs-item cs-miss';
@@ -709,28 +743,23 @@ function renderModalNums() {
       const badge=document.createElement('div'); badge.className='num-btn-badge'; badge.textContent=cantR;
       btn.appendChild(badge);
     }
-    // tap: tengo→missing | missing→repeat×1 | repeat→+1
     btn.onclick = async () => {
       if (!Array.isArray(missing[p])) missing[p]=[];
       if (!repeats[p]||Array.isArray(repeats[p])) repeats[p]={};
       const curM = missing[p].includes(i);
       const curR = parseInt(repeats[p][i])||0;
       if (!curM && curR===0) {
-        // tengo → missing
         missing[p]=[...missing[p],i].sort((a,b)=>a-b);
       } else if (curM && curR===0) {
-        // missing → repeat×1
         missing[p]=missing[p].filter(x=>x!==i);
         repeats[p][i]=1;
       } else if (!curM && curR>0) {
-        // repeat → +1
         repeats[p][i]=curR+1;
       }
       renderModalNums(); updateStats(); await syncToCloud();
     };
-    // long press / right click: decrease
     let pressTimer;
-    btn.addEventListener('touchstart', ()=>{ pressTimer=setTimeout(async()=>{ await decreaseNum(p,i); },500); });
+    btn.addEventListener('touchstart', ()=>{ pressTimer=setTimeout(async()=>{ await decreaseNum(p,i); },500); },{passive:true});
     btn.addEventListener('touchend',   ()=>clearTimeout(pressTimer));
     btn.addEventListener('touchmove',  ()=>clearTimeout(pressTimer));
     btn.oncontextmenu = async e => { e.preventDefault(); await decreaseNum(p,i); };
@@ -743,10 +772,9 @@ async function decreaseNum(p,i) {
   if (!repeats[p]||Array.isArray(repeats[p])) repeats[p]={};
   const curR = parseInt(repeats[p][i])||0;
   const curM = missing[p].includes(i);
-  if (curR>1)      repeats[p][i]=curR-1;
+  if (curR>1)        repeats[p][i]=curR-1;
   else if (curR===1) delete repeats[p][i];
-  else if (curM)   missing[p]=missing[p].filter(x=>x!==i);
-  // else already "tengo", nothing to do
+  else if (curM)     missing[p]=missing[p].filter(x=>x!==i);
   renderModalNums(); updateStats(); await syncToCloud();
 }
 
@@ -762,7 +790,7 @@ window.shareCountry = () => {
   const p=curPais, m=missing[p]||[], r=repeats[p]||{};
   const rList=Object.entries(r).filter(([,c])=>parseInt(c)>0).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([n,c])=>parseInt(c)>1?`${p}${n}(x${c})`:`${p}${n}`);
   let txt=`⚽ Figus Panini WC2026 — ${EMOJI[p]||''} ${NAMES[p]}\n`;
-  if (m.length)    txt+=`❌ Me faltan: ${m.join(', ')}\n`;
+  if (m.length)     txt+=`❌ Me faltan: ${m.join(', ')}\n`;
   if (rList.length) txt+=`🔄 Tengo de más: ${rList.join(', ')}\n`;
   openWA(txt);
 };
@@ -774,8 +802,7 @@ window.doCross = () => {
   for (const p of PAISES) {
     const myMis=new Set(missing[p]||[]);
     for (const [nStr,cant] of Object.entries(offered[p]||{})) {
-      const n=parseInt(nStr);
-      if (parseInt(cant)>0 && myMis.has(n)) matches.push(`${p}${n}`);
+      if (parseInt(cant)>0 && myMis.has(parseInt(nStr))) matches.push(`${p}${nStr}`);
     }
   }
   document.getElementById('cross-result').textContent = matches.length ? matches.join(', ') : 'Ninguna coincide :(';
@@ -821,7 +848,7 @@ window.setPreview = t => {
   ['missing','repeats','both'].forEach(x=>document.getElementById('pt-'+x).classList.toggle('active',x===t));
 };
 
-// ── Navigation ────────────────────────────────────────────────────────
+// ── Navigation ─────────────────────────────────────────────────────────
 window.showTab = t => {
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['album','comu','cross','share','import'][i]===t));
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
@@ -831,7 +858,7 @@ window.showTab = t => {
   document.querySelector('.content').scrollTop=0;
 };
 
-// ── Utils ─────────────────────────────────────────────────────────────
+// ── Utils ──────────────────────────────────────────────────────────────
 function showToast(msg) {
   const el=document.getElementById('toast'); el.textContent=msg;
   el.style.opacity='1'; setTimeout(()=>el.style.opacity='0',1800);
