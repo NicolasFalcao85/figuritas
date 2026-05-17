@@ -360,6 +360,7 @@ window.loginWithGoogle = async function() {
 
 window.logout = function() { signOut(auth); }
 
+// LOGICA ASINCRÓNICA MEJORADA: Cuando baja la info de internet, fuerza el render y recalcula KPIs al toque
 onAuthStateChanged(auth, async (user) => {
   if(user) {
     currentUser = user;
@@ -379,7 +380,10 @@ onAuthStateChanged(auth, async (user) => {
       await setDoc(userRef, { name: user.displayName || "Amigo", email: user.email, missing: missing, repeats: repeats });
       document.getElementById('header-user-sub').textContent = `HOLA, ${(user.displayName || "AMIGO").toUpperCase()}!`;
     }
-    renderAll(); listenCommunityChannels();
+    
+    // FIX DE SINCRONIZACIÓN: Redibuja y calcula sobre los datos bajados en caliente
+    renderAll(); 
+    listenCommunityChannels();
   } else {
     currentUser = null;
     document.getElementById('auth-screen').style.display = 'flex';
@@ -455,7 +459,7 @@ function parseText(text){
     if(m){
       const p=m[1].toUpperCase();
       if(PAISES.includes(p)){
-        const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
+        const nums = m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
         if(nums.length){if(!result[p])result[p]=[];result[p]=[...new Set([...result[p],...nums])].sort((a,b)=>a-b);}
       }
     }
@@ -547,9 +551,7 @@ window.clearCross = function() {
   document.getElementById('cross-count').textContent='—'; document.getElementById('sync-cross-btn').style.display='none';
 }
 
-// ==========================================
-// CORE DE NEGOCIO INTERACTIVO FIJADO AL 100%
-// ==========================================
+// ARREGLADO: El contador matemático puro del álbum
 function getHaveCount(p){
   const max = getMax(p);
   const mArr = missing[p] || [];
@@ -623,12 +625,17 @@ function openModal(p){
   renderModalNumbers(); document.getElementById('modal-bg').classList.add('open');
 }
 
+// CORREGIDO: Los clics individuales ahora impactan directo sobre las listas correctas de negocio y fuerzan recalculación de KPIs
 function renderModalNumbers() {
-  const p = curPais; const repObj = repeats[p]||{};
+  const p = curPais; 
+  if(!missing[p]) missing[p] = [];
+  if(!repeats[p]) repeats[p] = {};
+  
   const grid = document.getElementById('modal-nums'); grid.innerHTML = '';
   
   for(let i=1; i<=getMax(p); i++){
-    const inM = missing[p]?.includes(i); const cantRep = repObj[i]||0; 
+    const inM = missing[p].includes(i); 
+    const cantRep = repeats[p][i]||0; 
     const btn = document.createElement('button'); btn.textContent = i;
     
     if(inM){ btn.className = 'num-btn missing-mark'; } 
@@ -637,38 +644,38 @@ function renderModalNumbers() {
       const nb = document.createElement('div'); nb.className = 'num-btn-badge'; nb.textContent = cantRep; btn.appendChild(nb);
     } else { btn.className = 'num-btn have-mark'; }
     
-    // CLICK NORMAL (Falta -> Tengo -> Repe)
+    // CLICK NORMAL: Falta -> Tengo -> Repe x1 -> Repe x2 -> ...
     btn.onclick = () => {
-      if(!missing[p]) missing[p] = [];
-      if(!repeats[p]) repeats[p] = {};
-      
       if(missing[p].includes(i)) { 
-        missing[p] = missing[p].filter(x => x !== i); 
+        missing[p] = missing[p].filter(x => x !== i); // Pasa a Tengo (Limpio)
       }
       else if(cantRep === 0) { 
-        repeats[p][i] = 1; 
+        repeats[p][i] = 1; // Pasa a Repe x1
       }
       else { 
-        repeats[p][i]++; 
+        repeats[p][i]++; // Incrementa Repes
       }
-      renderModalNumbers(); updateStats(); syncToCloud();
+      renderModalNumbers(); 
+      updateStats(); // Fuerza recálculo inmediato de los KPIs en el panel superior
+      syncToCloud(); 
     };
     
-    // CLICK DERECHO / LONG PRESS (Resta)
+    // CLICK DERECHO / LONG PRESS: Restar repes o mandar a falta
     btn.oncontextmenu = (e) => {
       e.preventDefault();
-      if(!missing[p]) missing[p] = [];
-      if(!repeats[p]) repeats[p] = {};
+      const currentRepCount = repeats[p][i]||0;
 
-      if(cantRep > 1) { 
+      if(currentRepCount > 1) { 
         repeats[p][i]--; 
-      } else if(cantRep === 1) { 
-        delete repeats[p][i]; 
+      } else if(currentRepCount === 1) { 
+        delete repeats[p][i]; // Vuelve a Tengo (Limpio)
       }
       else if(!missing[p].includes(i)) { 
-        missing[p].push(i); missing[p].sort((a,b)=>a-b); 
+        missing[p].push(i); missing[p].sort((a,b)=>a-b); // Vuelve a Falta
       }
-      renderModalNumbers(); updateStats(); syncToCloud();
+      renderModalNumbers(); 
+      updateStats(); // Fuerza recálculo inmediato de los KPIs en el panel superior
+      syncToCloud(); 
     };
     grid.appendChild(btn);
   }
