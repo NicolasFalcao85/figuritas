@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#003DA5">
@@ -12,7 +12,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--red:#E8192C;--blue:#003DA5;--gold:#FFB81C;--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#777;--border:#e0e0e0;--bg2:#f5f5f5}
+:root{--red:#E8192C;--blue:#003DA5;--gold:#FFB81C;--bg:#f0f2f5;--card:#fff;--text:#111;--text2:#777;--border:#e0e0e0;--bg2:#f5f5f5;--badge-blue:#2563eb}
 @media(prefers-color-scheme:dark){:root{--bg:#0f0f1a;--card:#1c1c2e;--text:#f0f0f0;--text2:#999;--border:#2a2a3a;--bg2:#252535}}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Barlow Condensed',sans-serif;-webkit-tap-highlight-color:transparent}
 body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
@@ -62,7 +62,7 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 
 /* COUNTRY GRID */
 .country-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.country-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 10px 8px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
+.country-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 10px 8px;cursor:pointer;transition:all 0.15s;position:relative;overflow:visible;-webkit-tap-highlight-color:transparent;user-select:none}
 .country-card:active{transform:scale(0.96);opacity:0.9}
 .country-card.has-missing{border-top:3px solid var(--red)}
 .country-card.complete{border-top:3px solid #2ecc71}
@@ -75,11 +75,18 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .card-stats{display:flex;gap:5px;align-items:center}
 .cs-item{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 7px;border-radius:6px;line-height:1}
 .cs-miss{background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6}
-.cs-rep{background:#f0fff4;color:#1a7a3c;border:1px solid #b2dfcc}
 .cs-ok{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;font-size:10px}
+
+/* NOTIFICATION BADGE FOR REPEATS */
+.badge-repeats{position:absolute;top:-6px;right:-6px;background:var(--badge-blue);color:#fff;font-size:11px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.2);animation:popIn 0.2s ease;font-family:sans-serif}
+
+@keyframes popIn {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
 @media(prefers-color-scheme:dark){
   .cs-miss{background:#3a1010;color:#ff7070;border-color:#5a2020}
-  .cs-rep{background:#0a2e1a;color:#5ecc80;border-color:#1a5a30}
   .cs-ok{background:#0a1e2e;color:#60b0e0;border-color:#1a3a5a}
 }
 
@@ -87,31 +94,34 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,20px)}
-.modal-head{background:var(--blue);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;border-radius:20px 20px 0 0}
+.modal-head{background:var(--blue);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;border-radius:20px 20px 0 0;z-index:10}
 .modal-title{color:#fff;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;display:flex;align-items:center;gap:8px}
 .modal-title img{width:24px;height:24px}
 .close-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:16px;cursor:pointer;line-height:1;padding:5px 12px;border-radius:20px;font-weight:700}
 .modal-body{padding:14px}
 .modal-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;font-weight:700;align-items:center}
 .num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:10px}
-.num-btn{padding:11px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.12s;font-family:'Barlow Condensed',sans-serif;background:var(--bg2);color:var(--text2)}
+.num-btn{position:relative;padding:11px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.12s;font-family:'Barlow Condensed',sans-serif;background:var(--bg2);color:var(--text2);touch-action:manipulation;user-select:none}
 .num-btn.have-mark{background:#f0fff4;border-color:#81c784;color:#2e7d32}
 .num-btn.missing-mark{background:#fff0f0;border-color:#e57373;color:#c0392b}
-.num-btn.repeat-mark{background:#f0faf0;border-color:#66bb6a;color:#1a7a3c}
-.num-btn.both-mark{background:#fffbf0;border-color:var(--gold);color:#7a5c00}
+.num-btn.repeat-mark{background:#eff6ff;border-color:#93c5fd;color:#1e40af}
 .num-btn:active{transform:scale(0.9)}
+
+/* Mini badge inside button for multiples */
+.num-btn-badge{position:absolute;top:-4px;right:-4px;background:var(--badge-blue);color:white;font-size:9px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-weight:bold}
+
 @media(prefers-color-scheme:dark){
   .num-btn{background:#252535;color:#888;border-color:#333}
   .num-btn.have-mark{background:#0a2e1a;border-color:#2ecc71;color:#5ecc80}
   .num-btn.missing-mark{background:#3a1010;border-color:#e57373;color:#ff7070}
-  .num-btn.repeat-mark{background:#0a2e1a;border-color:#66bb6a;color:#5ecc80}
-  .num-btn.both-mark{background:#2e2000;border-color:var(--gold);color:#ffcc44}
+  .num-btn.repeat-mark{background:#1e293b;border-color:#3b82f6;color:#93c5fd}
 }
 
 /* BUTTONS */
-.btn{padding:10px 16px;border:2px solid var(--blue);border-radius:8px;background:var(--card);color:var(--blue);font-size:14px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.btn{padding:10px 16px;border:2px solid var(--blue);border-radius:8px;background:var(--card);color:var(--blue);font-size:14px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .btn:active{opacity:0.8;transform:scale(0.97)}
 .btn-primary{background:var(--blue);color:#fff}
+.btn-success{background:#2ecc71;color:#fff;border-color:#2ecc71}
 .btn-wa{background:#25D366;color:#fff;border-color:#25D366}
 .btn-block{width:100%;justify-content:center;padding:10px 8px;font-size:13px}
 .btn-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
@@ -182,7 +192,7 @@ textarea:focus{border-color:var(--blue);outline:none}
     </div>
     <div class="stat-card gold">
       <span class="stat-num" id="s-repes">0</span>
-      <div class="stat-label">Repetidas</div>
+      <div class="stat-label">Repetidas Totales</div>
     </div>
   </div>
   <div class="progress-wrap">
@@ -198,14 +208,13 @@ textarea:focus{border-color:var(--blue);outline:none}
       <option value="all">Todos</option>
       <option value="missing">Faltantes</option>
       <option value="complete">Completos</option>
-      <option value="repeats">Repetidas</option>
+      <option value="repeats">Con Repetidas</option>
     </select>
   </div>
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#52b788"></div> Repe</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Ambas</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Círculo = Repetidas</div>
   </div>
   <div class="country-grid" id="country-grid"></div>
 </div>
@@ -227,6 +236,7 @@ textarea:focus{border-color:var(--blue);outline:none}
       <div class="result-box" id="cross-result">—</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--blue);margin:8px 0" id="cross-count">—</div>
       <div class="btn-row">
+        <button class="btn btn-success" onclick="syncCrossedFigus()" id="sync-cross-btn" style="display:none"><i class="ti ti-download"></i> Sincronizar a mi Álbum</button>
         <button class="btn btn-wa" onclick="shareCross()" id="share-cross-btn" style="display:none"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
         <button class="btn" onclick="copyCross()" id="copy-cross-btn" style="display:none"><i class="ti ti-copy"></i> Copiar</button>
       </div>
@@ -321,11 +331,11 @@ textarea:focus{border-color:var(--blue);outline:none}
       <div class="modal-legend">
         <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Tengo</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Falta</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#52b788"></div> Repe</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Ambas</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--badge-blue)"></div> Repe (Toca + veces)</div>
       </div>
       <div class="num-grid" id="modal-nums"></div>
-      <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center">Toca para cambiar estado</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center">Toca repetidamente para sumar cantidades o mantené apretado para limpiar</div>
+      
       <div class="btn-row" style="margin-top:14px;justify-content:center">
         <button class="btn btn-wa" onclick="shareCountry()"><i class="ti ti-brand-whatsapp"></i> Compartir este equipo</button>
       </div>
@@ -333,20 +343,48 @@ textarea:focus{border-color:var(--blue);outline:none}
   </div>
 </div>
 
-<div id="toast">COPIADO!</div>
+<div id="toast">¡ACCION REALIZADA!</div>
 
 <script>
 const TOTAL_FIGUS=994;
 const PAISES=['FWC','MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN','CC'];
 const NAMES={'FWC':'FIFA WC','MEX':'México','RSA':'Sudáfrica','KOR':'Corea del Sur','CZE':'Rep. Checa','CAN':'Canadá','BIH':'Bosnia','QAT':'Qatar','SUI':'Suiza','BRA':'Brasil','MAR':'Marruecos','HAI':'Haití','SCO':'Escocia','USA':'EE.UU.','PAR':'Paraguay','AUS':'Australia','TUR':'Turquía','GER':'Alemania','CUW':'Curazao','CIV':'Costa de Marfil','ECU':'Ecuador','NED':'P. Bajos','JPN':'Japón','SWE':'Suecia','TUN':'Túnez','BEL':'Bélgica','EGY':'Egipto','IRN':'Irán','NZL':'Nueva Zelanda','ESP':'España','CPV':'Cabo Verde','KSA':'Arabia Saudita','URU':'Uruguay','FRA':'Francia','SEN':'Senegal','IRQ':'Irak','NOR':'Noruega','ARG':'Argentina','ALG':'Argelia','AUT':'Austria','JOR':'Jordania','POR':'Portugal','COD':'Congo DR','UZB':'Uzbekistán','COL':'Colombia','ENG':'Inglaterra','CRO':'Croacia','GHA':'Ghana','PAN':'Panamá','CC':'Coca-Cola'};
-const EMOJI={'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
+const EMOJI={'FWC':'🏆','MEX':'🇲🇽','RSA':'🇿🇦','KOR':'🇰🇷','CZE':'🇨🇿','CAN':'🇨🇦','BIH':'🇧🇦','QAT':'🇶🇦','SUI':'🇨🇭','BRA':'🇧🇷','MAR':'🇲🇦','HAI':'🇭🇹','SCO':'🏴%9F%8F%B4%F3%A0%81%87%F3%A0%81%82%F3%A0%81%85%F3%A0%81%8E%F3%A0%81%87%F3%A0%81%BF','USA':'🇺🇸','PAR':'🇵🇾','AUS':'🇦🇺','TUR':'🇹🇷','GER':'🇩🇪','CUW':'🇨🇼','CIV':'🇨🇮','ECU':'🇪🇨','NED':'🇳🇱','JPN':'🇯🇵','SWE':'🇸🇪','TUN':'🇹🇳','BEL':'🇧🇪','EGY':'🇪🇬','IRN':'🇮🇷','NZL':'🇳🇿','ESP':'🇪🇸','CPV':'🇨🇻','KSA':'🇸🇦','URU':'🇺🇾','FRA':'🇫🇷','SEN':'🇸🇳','IRQ':'🇮🇶','NOR':'🇳🇴','ARG':'🇦🇷','ALG':'🇩🇿','AUT':'🇦🇹','JOR':'🇯🇴','POR':'🇵🇹','COD':'🇨🇩','UZB':'🇺🇿','COL':'🇨🇴','ENG':'🏴%9F%8F%B4%F3%A0%81%87%F3%A0%81%82%F3%A0%81%85%F3%A0%81%8E%F3%A0%81%87%F3%A0%81%BF','CRO':'🇭🇷','GHA':'🇬🇭','PAN':'🇵🇦','CC':'🥤'};
 const MAX={'FWC':19,'CC':14};
 function getMax(p){return MAX[p]||20;}
+
+// Estructuras de datos:
+// missing[p] = Array de números faltantes (únicos)
+// repeats[p] = Objeto { número: cantidad } para permitir duplicados reales de una misma figu
 let missing={},repeats={};
-function save(){try{localStorage.setItem('figus_m10',JSON.stringify(missing));localStorage.setItem('figus_r10',JSON.stringify(repeats));}catch(e){}}
-function load(){try{const m=localStorage.getItem('figus_m10');const r=localStorage.getItem('figus_r10');if(m)missing=JSON.parse(m);if(r)repeats=JSON.parse(r);}catch(e){}}
+let lastCrossedMatches = []; // Almacena temporalmente el último cruce exitoso
+
+function save(){try{localStorage.setItem('figus_m11_v2',JSON.stringify(missing));localStorage.setItem('figus_r11_v2',JSON.stringify(repeats));}catch(e){}}
+function load(){
+  try{
+    const m=localStorage.getItem('figus_m11_v2');
+    const r=localStorage.getItem('figus_r11_v2');
+    if(m)missing=JSON.parse(m);
+    if(r)repeats=JSON.parse(r);
+  }catch(e){}
+}
+
 function tw(el){if(window.twemoji)twemoji.parse(el,{folder:'svg',ext:'.svg',base:'https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/'});}
-function getHaveCount(p){const max=getMax(p);const m=new Set(missing[p]||[]);const r=new Set(repeats[p]||[]);let c=0;for(let i=1;i<=max;i++){if(!m.has(i)&&!r.has(i))c++;}return c;}
+
+function getHaveCount(p){
+  const max=getMax(p);
+  const m=new Set(missing[p]||[]);
+  let c=0;
+  for(let i=1;i<=max;i++){
+    if(!m.has(i)) c++; // Si no falta, se asume que se tiene (al menos 1)
+  }
+  return c;
+}
+
+function getRepeatsCountTotal(p){
+  if(!repeats[p]) return 0;
+  return Object.values(repeats[p]).reduce((a,b)=>a+b,0);
+}
 
 function parseText(text){
   const result={};
@@ -354,15 +392,26 @@ function parseText(text){
     const line=raw.trim();
     if(!line||/^(figuritas app|usa méx|me faltan|repetidas|descarga|https?:)/i.test(line))continue;
     const hm=line.match(/^#([A-Z]{2,4})(\d+)/i);
-    if(hm){const p=hm[1].toUpperCase(),n=parseInt(hm[2]);if(PAISES.includes(p)&&n>0){if(!result[p])result[p]=[];result[p].push(n);}continue;}
+    if(hm){
+      const p=hm[1].toUpperCase(),n=parseInt(hm[2]);
+      if(PAISES.includes(p)&&n>0){if(!result[p])result[p]=[];result[p].push(n);}
+      continue;
+    }
     const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d]/g,' ').trim();
     const m=s.match(/^([A-Z]{2,4})\b[^:]*:\s*([\d,\s]+)/i);
-    if(m){const p=m[1].toUpperCase();if(PAISES.includes(p)){const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);if(nums.length){if(!result[p])result[p]=[];result[p]=[...new Set([...result[p],...nums])].sort((a,b)=>a-b);}}}
+    if(m){
+      const p=m[1].toUpperCase();
+      if(PAISES.includes(p)){
+        const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
+        if(nums.length){if(!result[p])result[p]=[];result[p]=[...new Set([...result[p],...nums])].sort((a,b)=>a-b);}
+      }
+    }
   }
   return result;
 }
+
 function parseFullExport(text){
-  let mode=null;const mis={},rep={};
+  let mode=null; const mis={}, rep={};
   for(const raw of text.split('\n')){
     const line=raw.trim();if(!line)continue;
     if(/me faltan/i.test(line)){mode='missing';continue;}
@@ -370,29 +419,75 @@ function parseFullExport(text){
     if(/^(figuritas app|usa méx|descarga|https?:)/i.test(line)){mode=null;continue;}
     if(!mode)continue;
     const hm=line.match(/^#([A-Z]{2,4})(\d+)/i);
-    if(hm){const p=hm[1].toUpperCase(),n=parseInt(hm[2]);if(PAISES.includes(p)&&n>0){const t=mode==='missing'?mis:rep;if(!t[p])t[p]=[];t[p].push(n);}continue;}
+    if(hm){
+      const p=hm[1].toUpperCase(),n=parseInt(hm[2]);
+      if(PAISES.includes(p)&&n>0){
+        if(mode==='missing'){ if(!mis[p])mis[p]=[]; mis[p].push(n); }
+        else { if(!rep[p])rep[p]={}; rep[p][n]=(rep[p][n]||0)+1; }
+      }
+      continue;
+    }
     const s=line.replace(/[\u{1F1E0}-\u{1F1FF}]/gu,'').replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u{FE00}-\u{FEFF}]/gu,'').replace(/[\u{E0000}-\u{E007F}]/gu,'').replace(/[^\w\s:,\d]/g,' ').trim();
     const m=s.match(/^([A-Z]{2,4})\b[^:]*:\s*([\d,\s]+)/i);
-    if(m){const p=m[1].toUpperCase();if(PAISES.includes(p)){const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);if(nums.length){const t=mode==='missing'?mis:rep;if(!t[p])t[p]=[];t[p]=[...new Set([...t[p],...nums])].sort((a,b)=>a-b);}}}
+    if(m){
+      const p=m[1].toUpperCase();
+      if(PAISES.includes(p)){
+        const nums=m[2].split(/[\s,]+/).map(n=>parseInt(n)).filter(n=>!isNaN(n)&&n>0);
+        if(nums.length){
+          if(mode==='missing'){ if(!mis[p])mis[p]=[]; mis[p]=[...new Set([...mis[p],...nums])].sort((a,b)=>a-b); }
+          else { if(!rep[p])rep[p]={}; nums.forEach(n=>{rep[p][n]=(rep[p][n]||0)+1;}); }
+        }
+      }
+    }
   }
-  return{missing:mis,repeats:rep};
+  return {missing:mis,repeats:rep};
 }
+
 function buildText(type){
-  const data=type==='missing'?missing:repeats;
   const hdr=type==='missing'?'Me faltan':'Repetidas';
   const lines=[`⚽ *Figus Panini - FIFA World Cup 2026*`,`*${hdr}*`,''];
-  for(const p of PAISES){const nums=data[p]||[];if(nums.length)lines.push(`${EMOJI[p]||''} ${p}: ${nums.join(', ')}`);}
+  
+  for(const p of PAISES){
+    if(type==='missing'){
+      const nums=missing[p]||[];
+      if(nums.length)lines.push(`${EMOJI[p]||''} ${p}: ${nums.join(', ')}`);
+    } else {
+      const repObj=repeats[p]||{};
+      const repArr=[];
+      Object.keys(repObj).sort((a,b)=>a-b).forEach(n=>{
+        const cant=repObj[n];
+        if(cant>0){
+          repArr.push(cant > 1 ? `${n}(x${cant})` : `${n}`);
+        }
+      });
+      if(repArr.length) lines.push(`${EMOJI[p]||''} ${p}: ${repArr.join(', ')}`);
+    }
+  }
   return lines.join('\n');
 }
+
 function buildBoth(){return buildText('missing')+'\n\n'+buildText('repeats');}
-function shareAll(type,mode){const txt=type==='both'?buildBoth():buildText(type);if(mode==='wa')openWA(txt);else navigator.clipboard.writeText(txt).then(toast).catch(()=>{});}
+
+function shareAll(type,mode){
+  const txt=type==='both'?buildBoth():buildText(type);
+  if(mode==='wa')openWA(txt);
+  else navigator.clipboard.writeText(txt).then(()=>showToast("¡COPIADO AL PORTAPAPELES!")).catch(()=>{});
+}
+
 let curPreview='missing';
 function setPreview(t){
   curPreview=t;
   document.getElementById('share-preview-box').textContent=t==='both'?buildBoth():buildText(t);
   ['missing','repeats','both'].forEach(x=>{const el=document.getElementById('pt-'+x);if(el)el.classList.toggle('active',x===t);});
 }
-function toast(){const el=document.getElementById('toast');el.style.opacity='1';setTimeout(()=>el.style.opacity='0',1800);}
+
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent = msg;
+  el.style.opacity='1';
+  setTimeout(()=>el.style.opacity='0',1800);
+}
+
 function showTab(t){
   document.querySelectorAll('.tab').forEach((el,i)=>{el.classList.toggle('active',['album','cross','share','import'][i]===t)});
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
@@ -401,32 +496,53 @@ function showTab(t){
   if(t==='share')setPreview(curPreview);
   document.querySelector('.content').scrollTop=0;
 }
+
 function setStatus(id,msg,ok){const el=document.getElementById(id);if(!el)return;el.className=ok?'status-ok':'status-err';el.textContent=msg;}
+
 function importFull(only){
   const text=document.getElementById('import-full').value;
   const parsed=parseFullExport(text);
-  const mk=Object.keys(parsed.missing).length,rk=Object.keys(parsed.repeats).length;
-  if(!mk&&!rk){setStatus('import-full-status','No se encontraron datos.',false);return;}
-  if(!only||only==='missing')if(mk)Object.assign(missing,parsed.missing);
-  if(!only||only==='repeats')if(rk)Object.assign(repeats,parsed.repeats);
+  const mk=Object.keys(parsed.missing).length, rk=Object.keys(parsed.repeats).length;
+  if(!mk&&!rk){setStatus('import-full-status','No se encontraron datos válidos.',false);return;}
+  
+  if(!only||only==='missing') if(mk) missing = parsed.missing;
+  if(!only||only==='repeats') if(rk) repeats = parsed.repeats;
+  
   save();renderAll();
-  let msg='✓';
-  if(mk&&(!only||only==='missing'))msg+=` ${mk} equipos faltantes`;
-  if(rk&&(!only||only==='repeats'))msg+=` · ${rk} repetidas`;
+  let msg='✓ Datos cargados.';
   setStatus('import-full-status',msg,true);
+  showToast("¡Importación Completa!");
 }
+
 function importSection(type){
   const id=type==='missing'?'import-missing':'import-repeats';
-  const parsed=parseText(document.getElementById(id).value);
+  const rawText=document.getElementById(id).value;
+  const parsed=parseText(rawText);
   const k=Object.keys(parsed).length;
-  if(!k){setStatus('import-'+type+'-status','No se pudo parsear.',false);return;}
-  if(type==='missing')Object.assign(missing,parsed);else Object.assign(repeats,parsed);
-  save();renderAll();setStatus('import-'+type+'-status',`✓ ${k} equipos.`,true);
+  if(!k){setStatus('import-'+type+'-status','No se pudo procesar el texto.',false);return;}
+  
+  if(type==='missing'){
+    Object.assign(missing,parsed);
+  } else {
+    // Al ser sección simple, asumimos x1 por cada número listado
+    for(const [p, nums] of Object.entries(parsed)){
+      if(!repeats[p]) repeats[p]={};
+      nums.forEach(n=>{ repeats[p][n] = (repeats[p][n]||0) + 1; });
+    }
+  }
+  save();renderAll();setStatus('import-'+type+'-status',`✓ Procesados ${k} equipos.`,true);
+  showToast("¡Sección Importada!");
 }
+
 function renderAll(){renderCountries();updateStats();}
+
 function updateStats(){
-  let tm=0,tr=0,th=0;
-  for(const p of PAISES){const m=(missing[p]||[]).length;tr+=(repeats[p]||[]).length;tm+=m;th+=getHaveCount(p);}
+  let tm=0, tr=0, th=0;
+  for(const p of PAISES){
+    tm+=(missing[p]||[]).length;
+    tr+=getRepeatsCountTotal(p);
+    th+=getHaveCount(p);
+  }
   const total=TOTAL_FIGUS;
   const pct=Math.round((th/total)*100);
   document.getElementById('s-total').textContent=tm;
@@ -436,97 +552,253 @@ function updateStats(){
   document.getElementById('s-have-sub').textContent=th+' / '+total;
   document.getElementById('progress-fill').style.width=pct+'%';
 }
+
 function renderCountries(){
   const filter=document.getElementById('filter-mode').value;
   const search=document.getElementById('search-country').value.toUpperCase();
   const grid=document.getElementById('country-grid');
   grid.innerHTML='';
   const frag=document.createDocumentFragment();
+  
   for(const p of PAISES){
     if(search&&!p.includes(search)&&!NAMES[p].toUpperCase().includes(search))continue;
-    const m=(missing[p]||[]).length,r=(repeats[p]||[]).length;
+    
+    const m=(missing[p]||[]).length;
+    const totalRepes=getRepeatsCountTotal(p);
+    
     if(filter==='missing'&&m===0)continue;
     if(filter==='complete'&&m>0)continue;
-    if(filter==='repeats'&&r===0)continue;
+    if(filter==='repeats'&&totalRepes===0)continue;
+    
     const card=document.createElement('div');
     card.className='country-card'+(m>0?' has-missing':' complete');
+    
+    // Badge flotante azul de notificación si tiene repetidas reales
+    if(totalRepes>0){
+      const rb=document.createElement('div');
+      rb.className='badge-repeats';
+      rb.textContent=totalRepes;
+      card.appendChild(rb);
+    }
+    
     const flagRow=document.createElement('div');flagRow.className='card-flag-row';
     const fc=document.createElement('div');fc.className='flag-cell';
     const fs=document.createElement('span');fs.textContent=EMOJI[p]||'';fs.style.fontSize='20px';fs.style.lineHeight='1';
     fc.appendChild(fs);flagRow.appendChild(fc);
+    
     const nm=document.createElement('div');nm.className='country-code';nm.textContent=p;
     flagRow.appendChild(nm);card.appendChild(flagRow);
+    
     const st=document.createElement('div');st.className='card-stats';
-    if(m>0){const it=document.createElement('div');it.className='cs-item cs-miss';it.innerHTML=`<i class="ti ti-x" style="font-size:11px"></i>${m}`;st.appendChild(it);}
-    if(r>0){const it=document.createElement('div');it.className='cs-item cs-rep';it.innerHTML=`<i class="ti ti-repeat" style="font-size:11px"></i>${r}`;st.appendChild(it);}
-    if(m===0&&r===0){const it=document.createElement('div');it.className='cs-item cs-ok';it.innerHTML=`<i class="ti ti-check" style="font-size:11px"></i>OK`;st.appendChild(it);}
-    card.appendChild(st);card.onclick=()=>openModal(p);
+    if(m>0){
+      const it=document.createElement('div');it.className='cs-item cs-miss';
+      it.innerHTML=`<i class="ti ti-x" style="font-size:11px"></i>${m}`;st.appendChild(it);
+    } else {
+      const it=document.createElement('div');it.className='cs-item cs-ok';
+      it.innerHTML=`<i class="ti ti-check" style="font-size:11px"></i>OK`;st.appendChild(it);
+    }
+    
+    card.appendChild(st);
+    card.onclick=()=>openModal(p);
     frag.appendChild(card);
   }
   grid.appendChild(frag);
   tw(grid);
 }
+
 let curPais='';
 function openModal(p){
   curPais=p;
   const fs=document.getElementById('modal-flag-span');
   fs.textContent=EMOJI[p]||'';fs.style.fontSize='22px';fs.style.lineHeight='1';
   document.getElementById('modal-name').textContent=' '+p+' — '+NAMES[p];
-  const m=new Set(missing[p]||[]),r=new Set(repeats[p]||[]);
+  
+  const m=new Set(missing[p]||[]);
+  const repObj=repeats[p]||{};
+  
   const grid=document.getElementById('modal-nums');grid.innerHTML='';
   for(let i=1;i<=getMax(p);i++){
-    const inM=m.has(i),inR=r.has(i);
+    const inM=m.has(i);
+    const cantRep=repObj[i]||0;
+    
     const btn=document.createElement('button');
-    btn.className='num-btn'+(inM&&inR?' both-mark':inM?' missing-mark':inR?' repeat-mark':' have-mark');
-    btn.textContent=i;btn.onclick=()=>cycleNum(p,i,btn);
+    btn.textContent=i;
+    
+    if(inM){
+      btn.className='num-btn missing-mark';
+    } else if(cantRep>0){
+      btn.className='num-btn repeat-mark';
+      // Badge interno con cantidad de repetidas (x2, x3, etc)
+      const nb=document.createElement('div');
+      nb.className='num-btn-badge';
+      nb.textContent=cantRep;
+      btn.appendChild(nb);
+    } else {
+      btn.className='num-btn have-mark';
+    }
+    
+    // Evento click normal maneja el flujo cíclico incremental
+    btn.onclick=()=>cycleNum(p,i,btn);
+    // Contextmenu (clic derecho o mantener presionado en celu) permite resetear a "Tengo" directamente
+    btn.oncontextmenu=(e)=>{ e.preventDefault(); resetToHave(p,i,btn); };
+    
     grid.appendChild(btn);
   }
   tw(fs);
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow='hidden';
 }
+
 function cycleNum(p,n,btn){
-  if(!missing[p])missing[p]=[];if(!repeats[p])repeats[p]=[];
-  const inM=missing[p].includes(n),inR=repeats[p].includes(n);
-  if(inM&&!inR){missing[p]=missing[p].filter(x=>x!==n);repeats[p]=[...repeats[p],n].sort((a,b)=>a-b);btn.className='num-btn repeat-mark';}
-  else if(!inM&&inR){repeats[p]=repeats[p].filter(x=>x!==n);missing[p]=[...missing[p],n].sort((a,b)=>a-b);btn.className='num-btn both-mark';}
-  else if(inM&&inR){missing[p]=missing[p].filter(x=>x!==n);repeats[p]=repeats[p].filter(x=>x!==n);btn.className='num-btn have-mark';}
-  else{missing[p]=[...missing[p],n].sort((a,b)=>a-b);btn.className='num-btn missing-mark';}
+  if(!missing[p])missing[p]=[];
+  if(!repeats[p])repeats[p]={};
+  
+  const inM=missing[p].includes(n);
+  const cantRep=repeats[p][n]||0;
+  
+  // Eliminar cualquier badge interno viejo antes de renderizar el nuevo estado
+  const oldBadge=btn.querySelector('.num-btn-badge');
+  if(oldBadge) oldBadge.remove();
+  
+  // Flujo cíclico inteligente:
+  // 1. Tengo -> Pasa a Falta
+  if(!inM && cantRep===0){
+    missing[p].push(n);
+    missing[p].sort((a,b)=>a-b);
+    btn.className='num-btn missing-mark';
+  }
+  // 2. Falta -> Pasa a Repetida x1
+  else if(inM){
+    missing[p]=missing[p].filter(x=>x!==n);
+    repeats[p][n]=1;
+    btn.className='num-btn repeat-mark';
+    const nb=document.createElement('div');nb.className='num-btn-badge';nb.textContent=1;btn.appendChild(nb);
+  }
+  // 3. Repetida -> Incrementa infinitamente (x2, x3, x4...)
+  else if(cantRep>0 && cantRep < 4){
+    repeats[p][n] = cantRep + 1;
+    btn.className='num-btn repeat-mark';
+    const nb=document.createElement('div');nb.className='num-btn-badge';nb.textContent=repeats[p][n];btn.appendChild(nb);
+  }
+  // 4. Si ya tiene 4 repes y vuelve a tocar, vuelve al inicio (Tengo) para cerrar el ciclo
+  else {
+    delete repeats[p][n];
+    btn.className='num-btn have-mark';
+  }
+  
   save();updateStats();renderCountries();
 }
+
+function resetToHave(p,n,btn){
+  if(missing[p]) missing[p]=missing[p].filter(x=>x!==n);
+  if(repeats[p]) delete repeats[p][n];
+  const oldBadge=btn.querySelector('.num-btn-badge');
+  if(oldBadge) oldBadge.remove();
+  btn.className='num-btn have-mark';
+  save();updateStats();renderCountries();
+  showToast("Reseteado a 'Tengo'");
+}
+
 function closeModal(e){
   if(!e||e.target===document.getElementById('modal-bg')){
     document.getElementById('modal-bg').classList.remove('open');
     document.body.style.overflow='';
   }
 }
+
 function shareCountry(){
-  const p=curPais,m=missing[p]||[],r=repeats[p]||[];
+  const p=curPais;
+  const m=missing[p]||[];
+  const repObj=repeats[p]||{};
   let txt=`⚽ Figus Panini WC2026 - ${EMOJI[p]||''} ${NAMES[p]}\n`;
   if(m.length)txt+=`❌ Me faltan: ${m.join(', ')}\n`;
-  if(r.length)txt+=`🔄 Tengo de más: ${r.join(', ')}\n`;
+  
+  const repArr=[];
+  Object.keys(repObj).forEach(n=>{ if(repObj[n]>0) repArr.push(repObj[n]>1?`${n}(x${repObj[n]})` : `${n}`); });
+  if(repArr.length)txt+=`🔄 Repetidas: ${repArr.join(', ')}\n`;
+  
   openWA(txt);
 }
+
 function doCross(){
   const offered=parseText(document.getElementById('cross-input').value);
-  const matches=[];
-  for(const[p,nums]of Object.entries(offered)){const myM=missing[p]||[];for(const n of nums){if(myM.includes(n))matches.push(`${p}${n}`);}}
+  lastCrossedMatches = []; 
+  
+  for(const [p,nums] of Object.entries(offered)){
+    const myM=missing[p]||[];
+    for(const n of nums){
+      if(myM.includes(n)){
+        lastCrossedMatches.push({pais: p, numero: n});
+      }
+    }
+  }
+  
   const res=document.getElementById('cross-result');
-  document.getElementById('cross-count').textContent=matches.length+' figuritas';
-  if(!matches.length){res.textContent='Ninguna coincide :(';document.getElementById('share-cross-btn').style.display='none';document.getElementById('copy-cross-btn').style.display='none';return;}
-  res.textContent=matches.join(', ');
+  document.getElementById('cross-count').textContent=lastCrossedMatches.length+' figuritas coinciden';
+  
+  if(!lastCrossedMatches.length){
+    res.textContent='Ninguna coincide :(';
+    document.getElementById('share-cross-btn').style.display='none';
+    document.getElementById('copy-cross-btn').style.display='none';
+    document.getElementById('sync-cross-btn').style.display='none';
+    return;
+  }
+  
+  const listStr = lastCrossedMatches.map(m=>`${m.pais}${m.numero}`).join(', ');
+  res.textContent=listStr;
+  
   document.getElementById('share-cross-btn').style.display='inline-flex';
   document.getElementById('copy-cross-btn').style.display='inline-flex';
+  document.getElementById('sync-cross-btn').style.display='inline-flex';
 }
-function clearCross(){document.getElementById('cross-input').value='';document.getElementById('cross-result').textContent='—';document.getElementById('cross-count').textContent='—';document.getElementById('share-cross-btn').style.display='none';document.getElementById('copy-cross-btn').style.display='none';}
-function shareCross(){openWA(`⚽ Figus Panini WC2026 — Las que me sirven:\n${document.getElementById('cross-result').textContent}\n¿Cambiamos? 🤝`);}
-function copyCross(){navigator.clipboard.writeText(document.getElementById('cross-result').textContent).then(toast).catch(()=>{});}
+
+function syncCrossedFigus(){
+  if(!lastCrossedMatches.length) return;
+  
+  let contador = 0;
+  lastCrossedMatches.forEach(item => {
+    if(missing[item.pais] && missing[item.pais].includes(item.numero)){
+      // La removemos de faltantes -> Automáticamente pasa al estado "Tengo"
+      missing[item.pais] = missing[item.pais].filter(x => x !== item.numero);
+      contador++;
+    }
+  });
+  
+  save();
+  renderAll();
+  
+  showToast(`¡Sincronizadas ${contador} figus al álbum!`);
+  clearCross();
+}
+
+function clearCross(){
+  document.getElementById('cross-input').value='';
+  document.getElementById('cross-result').textContent='—';
+  document.getElementById('cross-count').textContent='—';
+  document.getElementById('share-cross-btn').style.display='none';
+  document.getElementById('copy-cross-btn').style.display='none';
+  document.getElementById('sync-cross-btn').style.display='none';
+  lastCrossedMatches = [];
+}
+
+function shareCross(){
+  const listStr = lastCrossedMatches.map(m=>`${m.pais}${m.numero}`).join(', ');
+  openWA(`⚽ Figus Panini WC2026 — Estas de tu lista me sirven:\n${listStr}\n¿Cambiamos? 🤝`);
+}
+
+function copyCross(){
+  const listStr = lastCrossedMatches.map(m=>`${m.pais}${m.numero}`).join(', ');
+  navigator.clipboard.writeText(listStr).then(()=>showToast("¡Copiado!")).catch(()=>{});
+}
+
 function openWA(text){window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');}
 
+// CARGA INICIAL DE DATOS DEMO SINO HAY NADA
 load();
-if(!Object.keys(missing).length&&!Object.keys(repeats).length){
-  missing={"FWC":[1,2,6,7,8,9,10,13,17,19],"MEX":[6,11],"RSA":[3,10,11,15,16,19],"KOR":[3,11,15,16,19],"CZE":[1,10],"CAN":[6,12,20],"BIH":[1,11],"QAT":[1,18],"SUI":[9,14,18],"BRA":[4,8,10,18],"MAR":[13],"HAI":[18],"SCO":[7,14,18],"USA":[6,10],"PAR":[12,15],"AUS":[7,12,13],"TUR":[14],"GER":[11],"CUW":[1,5],"CIV":[5,9,14,15,18,19],"ECU":[12,14,18],"NED":[5,19],"JPN":[4,8,12,13,17,18],"SWE":[1,2,3,7,8,16],"TUN":[2,10,11,13],"BEL":[8,11,16,20],"EGY":[1,5],"IRN":[2,6,8,12,17],"NZL":[2,3,6,7,10,11,15,20],"ESP":[1,2,18,20],"CPV":[1,5,9,15,16],"KSA":[1,4,8,9,14,15,17],"URU":[11,14,19],"FRA":[3,6,10,11,12,16,20],"SEN":[5,7,11],"IRQ":[4,12,17],"NOR":[4,9,12,13,18],"ARG":[5,14,18],"ALG":[2,4,15,19],"AUT":[9,14,18,20],"JOR":[2,4,5,12,14,18],"POR":[3,15,20],"COD":[1],"UZB":[17],"COL":[1,4,7,8,15,17,20],"ENG":[10],"CRO":[7,11],"GHA":[5,8,11,16,17],"PAN":[3,5,7,8,11,12,14,16,18,20],"CC":[1,2,3,4,5,7,10,13,14]};
-  repeats={"FWC":[11],"KOR":[4,8,12],"CZE":[3],"CAN":[3,7],"QAT":[3,4,5,8,9],"SUI":[10],"BRA":[3,5,7,9,11,13],"MAR":[4],"PAR":[20],"AUS":[4,9],"GER":[3,9],"CUW":[3],"CIV":[16],"NED":[9,12,18],"JPN":[9,11,16],"TUN":[9,12,14],"BEL":[3,7,14,18],"NZL":[4,14],"ESP":[6],"SEN":[8],"NOR":[3,7,10,11],"ARG":[8],"JOR":[9],"COD":[3],"UZB":[4,5,8,11],"ENG":[20],"CRO":[9,13,14]};
+if(!Object.keys(missing).length && !Object.keys(repeats).length){
+  missing={"FWC":[1,2,6,7,8,9,10,13,17,19],"MEX":[6,11],"RSA":[3,10,11,15,16,19],"KOR":[3,11,15,16,19],"ARG":[1,2,3,4,10]};
+  // Formato nuevo de repetidas soportando multiplicidad real:
+  repeats={"FWC":{"11":1},"KOR":{"4":2,"8":1,"12":3},"CAN":{"3":1,"7":2},"ARG":{"8":3}};
   save();
 }
 renderAll();
