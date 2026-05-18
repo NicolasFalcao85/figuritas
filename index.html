@@ -102,6 +102,7 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .btn-primary{background:var(--blue);color:#fff}
 .btn-wa{background:#25D366;color:#fff;border-color:#25D366}
 .btn-danger{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-pdf{background:#C0392B;color:#fff;border-color:#C0392B}
 .btn-block{width:100%;justify-content:center;padding:10px 8px;font-size:13px}
 .btn-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
 textarea{width:100%;min-height:140px;font-family:monospace;font-size:12px;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);resize:vertical;margin-bottom:4px}
@@ -116,6 +117,11 @@ textarea:focus{border-color:var(--blue);outline:none}
 .auth-box{background:var(--card);width:100%;max-width:380px;border-radius:16px;padding:32px 24px;border:1px solid var(--border);box-shadow:0 10px 25px rgba(0,0,0,0.1);text-align:center}
 .btn-google{background:#fff;color:#444;border:1.5px solid #ddd;gap:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
 #toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;padding:9px 22px;border-radius:20px;font-size:13px;font-weight:700;z-index:200;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap}
+@media print {
+  body *{visibility:hidden !important}
+  #pdf-print-area,#pdf-print-area *{visibility:visible !important}
+  #pdf-print-area{position:fixed !important;top:0 !important;left:0 !important;width:100% !important;background:#fff !important;z-index:99999 !important;padding:0 !important}
+}
 </style>
 </head>
 <body>
@@ -273,6 +279,20 @@ textarea:focus{border-color:var(--blue);outline:none}
         </div>
       </div>
     </div>
+
+    <div class="panel" style="margin-bottom:12px">
+      <div class="panel-title">Exportar PDF</div>
+      <div class="tip">Genera una hoja A4 compacta con todas tus faltantes agrupadas por equipo.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <button class="btn btn-pdf btn-block" onclick="exportPDF('missing')">
+          <i class="ti ti-file-type-pdf"></i> PDF — Mis faltantes
+        </button>
+        <button class="btn btn-pdf btn-block" onclick="exportPDF('repeats')" style="background:#7B2FBE;border-color:#7B2FBE">
+          <i class="ti ti-file-type-pdf"></i> PDF — Mis repetidas
+        </button>
+      </div>
+    </div>
+
     <div class="panel">
       <div class="panel-title">Vista previa</div>
       <div class="prev-tabs">
@@ -291,8 +311,8 @@ textarea:focus{border-color:var(--blue);outline:none}
         Detecta automáticamente el formato y qué pisar:<br>
         • <b>Figuritas App</b> — "Me faltan" / "Repetidas"<br>
         • <b>Album Master</b> — "❌ ME FALTAN" / "🔁 REPETIDAS"<br>
-        • <b>WhatsApp faltantes</b> — header "FALTAN" + líneas #CODE (pisa solo faltantes)<br>
-        • <b>WhatsApp repetidas</b> — header "REPETIDAS" + líneas #CODE (xN) (pisa solo repetidas)<br>
+        • <b>WhatsApp faltantes</b> — header "FALTAN" + líneas #CODE<br>
+        • <b>WhatsApp repetidas</b> — header "REPETIDAS" + líneas #CODE (xN)<br>
         • Podés pegar las dos listas juntas y detecta ambas.
       </div>
       <textarea id="import-full" style="min-height:160px" placeholder="Pegá acá cualquiera de los formatos..."></textarea>
@@ -491,162 +511,231 @@ function parseUniversal(text) {
   const rep = {};
   for (const p of PAISES) { mis[p] = []; rep[p] = {}; }
 
-  // Detectar si hay líneas tipo #CODE (con o sin cantidad)
-  const hasHashLines = /\*?\s*#[A-Z]{2,4}0*\d+/i.test(text);
-  const isAlbumMaster = !hasHashLines && (/album master/i.test(text) || /ME FALTAN/u.test(text));
-  const isFiguApp = !hasHashLines && !isAlbumMaster &&
+  const hasHashLines   = /\*?\s*#[A-Z]{2,4}0*\d+/i.test(text);
+  const isAlbumMaster  = !hasHashLines && (/album master/i.test(text) || /ME FALTAN/u.test(text));
+  const isFiguApp      = !hasHashLines && !isAlbumMaster &&
     (/me faltan/i.test(text) || /^repetidas/im.test(text) || /figuritas app/i.test(text));
 
-  // ── FORMATO WhatsApp #CODE (faltantes y/o repetidas) ────────────────
+  // ── FORMATO WhatsApp #CODE ────────────────────────────────────────
   if (hasHashLines) {
     let mode = null;
-
     for (const raw of text.split('\n')) {
-      const line = raw.trim();
-      if (!line) continue;
-
-      // Detectar header de sección por palabras clave
-      // Header de faltantes: "FIGURITAS QUE ME FALTAN" o "ME FALTAN"
-      // Header de repetidas: "FIGURITAS REPETIDAS" o "REPETIDAS PARA CAMBIO"
-      if (!line.startsWith('#') && !line.startsWith('*\u00a0#') && !line.match(/^\*\s*#/)) {
-        if (/FALTAN/i.test(line) && !/play\.google|apps\.apple/i.test(line)) {
-          mode = 'missing'; continue;
-        }
-        if (/REPETIDAS/i.test(line) && !/play\.google|apps\.apple/i.test(line)) {
-          mode = 'repeats'; continue;
-        }
-        // skip noise lines
+      const line = raw.trim(); if (!line) continue;
+      if (!line.startsWith('#') && !line.match(/^\*\s*#/)) {
+        if (/FALTAN/i.test(line) && !/play\.google|apps\.apple/i.test(line))     { mode='missing'; continue; }
+        if (/REPETIDAS/i.test(line) && !/play\.google|apps\.apple/i.test(line))  { mode='repeats'; continue; }
         if (/ayúdame|cuáles te faltan|play\.google|apps\.apple|https?:/i.test(line)) continue;
       }
-
-      // Línea con cantidad → repetida: * #CODE123 (x2)
+      // con cantidad → siempre repetida
       const mRep = line.match(/#([A-Z]{2,4})0*(\d+)\s*\(x?(\d+)\)/i);
       if (mRep) {
-        const p    = mRep[1].toUpperCase();
-        const n    = parseInt(mRep[2]);
-        const cant = parseInt(mRep[3]) || 1;
-        if (PAISES.includes(p) && n > 0) {
-          // Si el modo es 'missing' explícito pero tiene (xN), igual va a repeats
-          rep[p][n] = (rep[p][n] || 0) + cant;
-        }
+        const p=mRep[1].toUpperCase(), n=parseInt(mRep[2]), cant=parseInt(mRep[3])||1;
+        if (PAISES.includes(p) && n>0) rep[p][n]=(rep[p][n]||0)+cant;
         continue;
       }
-
-      // Línea sin cantidad → depende del modo detectado
+      // sin cantidad → según modo
       const mCode = line.match(/#([A-Z]{2,4})0*(\d+)\s*$/i);
       if (mCode) {
-        const p = mCode[1].toUpperCase();
-        const n = parseInt(mCode[2]);
-        if (PAISES.includes(p) && n > 0) {
-          if (mode === 'repeats') {
-            rep[p][n] = (rep[p][n] || 0) + 1;
-          } else {
-            // 'missing' o sin modo detectado → faltante
-            mis[p].push(n);
-          }
+        const p=mCode[1].toUpperCase(), n=parseInt(mCode[2]);
+        if (PAISES.includes(p) && n>0) {
+          if (mode==='repeats') rep[p][n]=(rep[p][n]||0)+1;
+          else mis[p].push(n);
         }
       }
     }
-
-    for (const p of PAISES) mis[p] = [...new Set(mis[p])].sort((a,b)=>a-b);
-    return { missing: mis, repeats: rep, fmt: 'WhatsApp #CODE' };
+    for (const p of PAISES) mis[p]=[...new Set(mis[p])].sort((a,b)=>a-b);
+    return { missing:mis, repeats:rep, fmt:'WhatsApp #CODE' };
   }
 
-  // ── FORMATO Album Master ─────────────────────────────────────────────
+  // ── FORMATO Album Master ──────────────────────────────────────────
   if (isAlbumMaster) {
     let mode = null;
     for (const raw of text.split('\n')) {
-      const line = raw.trim(); if (!line) continue;
-      if (/ME FALTAN/i.test(line))  { mode = 'missing'; continue; }
-      if (/REPETIDAS/i.test(line))  { mode = 'repeats'; continue; }
+      const line=raw.trim(); if (!line) continue;
+      if (/ME FALTAN/i.test(line))  { mode='missing'; continue; }
+      if (/REPETIDAS/i.test(line))  { mode='repeats'; continue; }
       if (!mode) continue;
-      const stripped = stripEmojis(line);
-      const m = stripped.match(/^([A-Z]{2,4})\s*:\s*(.+)/i);
+      const s=stripEmojis(line);
+      const m=s.match(/^([A-Z]{2,4})\s*:\s*(.+)/i);
       if (!m) continue;
-      const p = m[1].toUpperCase(); if (!PAISES.includes(p)) continue;
+      const p=m[1].toUpperCase(); if(!PAISES.includes(p)) continue;
       for (const token of m[2].split(/[\s,]+/)) {
-        const tm = token.match(/^(\d+)(?:\(x?(\d+)\))?/i);
-        if (!tm) continue;
-        const n = parseInt(tm[1]), cant = parseInt(tm[2]||'1');
+        const tm=token.match(/^(\d+)(?:\(x?(\d+)\))?/i); if(!tm) continue;
+        const n=parseInt(tm[1]), cant=parseInt(tm[2]||'1');
         if (isNaN(n)||n<=0) continue;
         if (mode==='missing') mis[p].push(n);
-        else rep[p][n] = (rep[p][n]||0) + cant;
+        else rep[p][n]=(rep[p][n]||0)+cant;
       }
     }
-    for (const p of PAISES) mis[p] = [...new Set(mis[p])].sort((a,b)=>a-b);
-    return { missing: mis, repeats: rep, fmt: 'Album Master' };
+    for (const p of PAISES) mis[p]=[...new Set(mis[p])].sort((a,b)=>a-b);
+    return { missing:mis, repeats:rep, fmt:'Album Master' };
   }
 
-  // ── FORMATO Figuritas App ────────────────────────────────────────────
+  // ── FORMATO Figuritas App ─────────────────────────────────────────
   if (isFiguApp) {
     let mode = null;
     for (const raw of text.split('\n')) {
-      const line = raw.trim(); if (!line) continue;
-      if (/^me faltan/i.test(line))  { mode = 'missing'; continue; }
-      if (/^repetidas/i.test(line))  { mode = 'repeats'; continue; }
-      if (/^(figuritas app|usa méx|descarga|https?:)/i.test(line)) { mode = null; continue; }
+      const line=raw.trim(); if (!line) continue;
+      if (/^me faltan/i.test(line))  { mode='missing'; continue; }
+      if (/^repetidas/i.test(line))  { mode='repeats'; continue; }
+      if (/^(figuritas app|usa méx|descarga|https?:)/i.test(line)) { mode=null; continue; }
       if (!mode) continue;
-      const stripped = stripEmojis(line);
-      const m = stripped.match(/^([A-Z]{2,4})\s*:\s*(.+)/i);
+      const s=stripEmojis(line);
+      const m=s.match(/^([A-Z]{2,4})\s*:\s*(.+)/i);
       if (!m) continue;
-      const p = m[1].toUpperCase(); if (!PAISES.includes(p)) continue;
+      const p=m[1].toUpperCase(); if(!PAISES.includes(p)) continue;
       for (const token of m[2].split(/[\s,]+/)) {
-        const tm = token.match(/^(\d+)(?:\(x?(\d+)\))?/i);
-        if (!tm) continue;
-        const n = parseInt(tm[1]), cant = parseInt(tm[2]||'1');
+        const tm=token.match(/^(\d+)(?:\(x?(\d+)\))?/i); if(!tm) continue;
+        const n=parseInt(tm[1]), cant=parseInt(tm[2]||'1');
         if (isNaN(n)||n<=0) continue;
         if (mode==='missing') mis[p].push(n);
-        else rep[p][n] = (rep[p][n]||0) + cant;
+        else rep[p][n]=(rep[p][n]||0)+cant;
       }
     }
-    for (const p of PAISES) mis[p] = [...new Set(mis[p])].sort((a,b)=>a-b);
-    return { missing: mis, repeats: rep, fmt: 'Figuritas App' };
+    for (const p of PAISES) mis[p]=[...new Set(mis[p])].sort((a,b)=>a-b);
+    return { missing:mis, repeats:rep, fmt:'Figuritas App' };
   }
 
-  return { missing: mis, repeats: rep, fmt: 'Desconocido' };
+  return { missing:mis, repeats:rep, fmt:'Desconocido' };
 }
 
 // ── Import ────────────────────────────────────────────────────────────
 window.importFull = async () => {
   const text   = document.getElementById('import-full').value.trim();
   const status = document.getElementById('import-status');
-  status.style.display = 'block';
-  status.className = '';
-  status.textContent = 'Procesando...';
+  status.style.display='block'; status.className=''; status.textContent='Procesando...';
+  if (!text) { status.className='status-err'; status.textContent='⚠️ El campo está vacío.'; return; }
 
-  if (!text) {
-    status.className = 'status-err';
-    status.textContent = '⚠️ El campo está vacío.';
+  const { missing:newMis, repeats:newRep, fmt } = parseUniversal(text);
+  const totalMis = PAISES.reduce((a,p)=>a+newMis[p].length,0);
+  const totalRep = PAISES.reduce((a,p)=>a+Object.values(newRep[p]||{}).reduce((x,y)=>x+y,0),0);
+
+  if (totalMis===0 && totalRep===0) {
+    status.className='status-err';
+    status.textContent=`⚠️ No se encontraron datos (formato: ${fmt}). Verificá el texto pegado.`;
     return;
   }
 
-  const { missing: newMis, repeats: newRep, fmt } = parseUniversal(text);
-  const totalMis = PAISES.reduce((a,p) => a + newMis[p].length, 0);
-  const totalRep = PAISES.reduce((a,p) => a + Object.values(newRep[p]||{}).reduce((x,y)=>x+y,0), 0);
+  const hasMissing = PAISES.some(p=>newMis[p].length>0);
+  const hasRepeats = PAISES.some(p=>Object.keys(newRep[p]||{}).length>0);
+  if (hasMissing) missing=newMis;
+  if (hasRepeats) { for (const p of PAISES) repeats[p]={...(newRep[p]||{})}; }
 
-  if (totalMis === 0 && totalRep === 0) {
-    status.className = 'status-err';
-    status.textContent = `⚠️ No se encontraron datos (formato: ${fmt}). Verificá el texto pegado.`;
-    return;
-  }
-
-  // Decidir qué pisar según qué vino en el texto
-  const hasMissing = PAISES.some(p => newMis[p].length > 0);
-  const hasRepeats = PAISES.some(p => Object.keys(newRep[p]||{}).length > 0);
-
-  if (hasMissing) missing = newMis;
-  if (hasRepeats) {
-    for (const p of PAISES) repeats[p] = { ...(newRep[p]||{}) };
-  }
-
-  status.textContent = 'Guardando en la nube...';
+  status.textContent='Guardando en la nube...';
   await syncToCloud();
 
-  const pisado = hasMissing && hasRepeats ? 'Faltantes y Repetidas' : hasMissing ? 'Faltantes' : 'Repetidas';
-  status.className = 'status-ok';
-  status.innerHTML = `✓ <b>${fmt}</b> — Pisado: <b>${pisado}</b><br><span style="font-size:12px;font-weight:normal">Faltantes: <b>${totalMis}</b> · Repetidas (unidades): <b>${totalRep}</b></span>`;
+  const pisado = hasMissing&&hasRepeats ? 'Faltantes y Repetidas' : hasMissing ? 'Faltantes' : 'Repetidas';
+  status.className='status-ok';
+  status.innerHTML=`✓ <b>${fmt}</b> — Pisado: <b>${pisado}</b><br><span style="font-size:12px;font-weight:normal">Faltantes: <b>${totalMis}</b> · Repetidas (unidades): <b>${totalRep}</b></span>`;
   showToast('¡ÁLBUM ACTUALIZADO!');
   renderAll();
+};
+
+// ── PDF Export ────────────────────────────────────────────────────────
+window.exportPDF = (type) => {
+  const isMissing = type === 'missing';
+  const rows = [];
+
+  for (const p of PAISES) {
+    if (isMissing) {
+      const m = missing[p] || [];
+      if (m.length) rows.push({ p, items: m.map(n => ({ n, label: String(n) })) });
+    } else {
+      const r = repeats[p] || {};
+      const entries = Object.entries(r)
+        .filter(([,c]) => parseInt(c) > 0)
+        .sort((a,b) => parseInt(a[0])-parseInt(b[0]))
+        .map(([n,c]) => ({ n: parseInt(n), label: parseInt(c)>1 ? `${n}×${c}` : String(n) }));
+      if (entries.length) rows.push({ p, items: entries });
+    }
+  }
+
+  if (!rows.length) { showToast('NO HAY DATOS'); return; }
+
+  const COLS = 7;
+  const now  = new Date().toLocaleDateString('es-AR');
+  const totalItems = rows.reduce((a,r) => a+r.items.length, 0);
+  const title  = isMissing ? 'MIS FALTANTES' : 'MIS REPETIDAS';
+  const accentColor = isMissing ? '#E8192C' : '#7B2FBE';
+
+  const tableRows = rows.map(({ p, items }) => {
+    const chunks = [];
+    for (let i = 0; i < items.length; i += COLS) chunks.push(items.slice(i, i+COLS));
+    return chunks.map((chunk, ci) => {
+      const nameTd = ci === 0
+        ? `<td class="pname">${p}</td>`
+        : `<td class="pname" style="color:transparent;border-right:none">—</td>`;
+      const numTds = chunk.map(it => `<td class="num">${it.label}</td>`).join('');
+      const empties = COLS - chunk.length;
+      const emptyTds = Array(empties).fill('<td class="empty"></td>').join('');
+      return `<tr>${nameTd}${numTds}${emptyTds}</tr>`;
+    }).join('');
+  }).join('<tr class="sep"><td colspan="${COLS+1}"></td></tr>');
+
+  const printHTML = `
+<div id="pdf-print-area" style="font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000;padding:18px 22px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px;padding-bottom:8px;border-bottom:3px solid ${accentColor}">
+    <div>
+      <div style="font-size:19px;font-weight:700;color:#003DA5;letter-spacing:1px">PANINI — FIFA WORLD CUP 2026</div>
+      <div style="font-size:12px;color:#555;margin-top:3px">${title} · Generado el ${now}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:26px;font-weight:700;color:${accentColor};line-height:1">${totalItems}</div>
+      <div style="font-size:10px;color:#555;letter-spacing:0.5px">${isMissing ? 'FALTANTES' : 'UNIDADES'}</div>
+    </div>
+  </div>
+  <table style="width:100%;border-collapse:collapse;font-size:10.5px">
+    <tbody>${tableRows}</tbody>
+  </table>
+  <div style="margin-top:12px;font-size:8.5px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:6px">
+    Generado con Figus Panini WC2026 App · ${window.location.hostname}
+  </div>
+</div>`;
+
+  const printStyle = `
+<style id="pdf-style">
+@media print {
+  body * { visibility: hidden !important; }
+  #pdf-print-area, #pdf-print-area * { visibility: visible !important; }
+  #pdf-print-area {
+    position: fixed !important; top: 0 !important; left: 0 !important;
+    width: 100% !important; background: #fff !important; z-index: 99999 !important;
+    padding: 14px 18px !important;
+  }
+  @page { margin: 10mm; size: A4 portrait; }
+}
+.pname {
+  font-weight: 700; color: #003DA5; font-size: 10px;
+  padding: 2px 5px 2px 2px; white-space: nowrap; vertical-align: middle;
+  border-right: 1px solid #ddd; min-width: 46px;
+}
+.num {
+  text-align: center; font-size: 10px; padding: 2px 4px;
+  background: #f7f7f7; border: 1px solid #e0e0e0;
+  border-radius: 3px; min-width: 26px; vertical-align: middle;
+}
+.empty { min-width: 26px; border: none; background: transparent; }
+.sep td { height: 3px; background: transparent; }
+tr { line-height: 1.6; }
+</style>`;
+
+  let existing = document.getElementById('pdf-print-area');
+  if (existing) existing.parentElement?.remove();
+  let existingStyle = document.getElementById('pdf-style');
+  if (existingStyle) existingStyle.remove();
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = printHTML;
+  document.body.appendChild(wrapper);
+  document.head.insertAdjacentHTML('beforeend', printStyle);
+
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => {
+      wrapper.remove();
+      document.getElementById('pdf-style')?.remove();
+    }, 1500);
+  }, 150);
 };
 
 // ── Render ────────────────────────────────────────────────────────────
@@ -657,10 +746,10 @@ function updateStats() {
   for (const p of PAISES) {
     totalMis += (missing[p]||[]).length;
     totalRep += Object.values(repeats[p]||{}).reduce((a,b)=>a+b,0);
-    const mSet = new Set(missing[p]||[]);
+    const mSet=new Set(missing[p]||[]);
     for (let i=1;i<=getMax(p);i++) if(!mSet.has(i)) totalHave++;
   }
-  const pct = Math.round((totalHave/TOTAL_FIGUS)*100);
+  const pct=Math.round((totalHave/TOTAL_FIGUS)*100);
   document.getElementById('s-total').textContent    = totalMis;
   document.getElementById('s-repes').textContent    = totalRep;
   document.getElementById('s-pct').textContent      = pct+'%';
@@ -670,34 +759,32 @@ function updateStats() {
 }
 
 window.renderCountries = () => {
-  const filter = document.getElementById('filter-mode').value;
-  const search = document.getElementById('search-country').value.toUpperCase();
-  const grid   = document.getElementById('country-grid');
-  grid.innerHTML = '';
-  const frag = document.createDocumentFragment();
+  const filter=document.getElementById('filter-mode').value;
+  const search=document.getElementById('search-country').value.toUpperCase();
+  const grid  =document.getElementById('country-grid');
+  grid.innerHTML='';
+  const frag=document.createDocumentFragment();
   for (const p of PAISES) {
     if (search && !p.includes(search) && !NAMES[p].toUpperCase().includes(search)) continue;
-    const mArr   = missing[p]||[];
-    const rObj   = repeats[p]||{};
-    const mCount = mArr.length;
-    const rTotal = Object.values(rObj).reduce((a,b)=>a+b,0);
+    const mArr=missing[p]||[], rObj=repeats[p]||{};
+    const mCount=mArr.length;
+    const rTotal=Object.values(rObj).reduce((a,b)=>a+b,0);
     if (filter==='missing'  && mCount===0) continue;
     if (filter==='complete' && mCount>0)   continue;
     if (filter==='repeats'  && rTotal===0) continue;
-
-    const card = document.createElement('div');
-    card.className = 'country-card '+(mCount>0?'has-missing':'complete');
+    const card=document.createElement('div');
+    card.className='country-card '+(mCount>0?'has-missing':'complete');
     if (rTotal>0) {
-      const rb = document.createElement('div'); rb.className='badge-repeats'; rb.textContent=rTotal;
+      const rb=document.createElement('div'); rb.className='badge-repeats'; rb.textContent=rTotal;
       card.appendChild(rb);
     }
-    const flagRow = document.createElement('div'); flagRow.className='card-flag-row';
-    const fc = document.createElement('div'); fc.className='flag-cell';
-    const fs = document.createElement('span'); fs.textContent=EMOJI[p]||''; fs.style.fontSize='20px';
+    const flagRow=document.createElement('div'); flagRow.className='card-flag-row';
+    const fc=document.createElement('div'); fc.className='flag-cell';
+    const fs=document.createElement('span'); fs.textContent=EMOJI[p]||''; fs.style.fontSize='20px';
     fc.appendChild(fs); flagRow.appendChild(fc);
-    const nm = document.createElement('div'); nm.className='country-code'; nm.textContent=p;
+    const nm=document.createElement('div'); nm.className='country-code'; nm.textContent=p;
     flagRow.appendChild(nm); card.appendChild(flagRow);
-    const st = document.createElement('div'); st.className='card-stats';
+    const st=document.createElement('div'); st.className='card-stats';
     if (mCount>0) {
       const pill=document.createElement('div'); pill.className='cs-item cs-miss';
       pill.innerHTML=`<i class="ti ti-x" style="font-size:10px"></i>${mCount}`;
@@ -708,7 +795,7 @@ window.renderCountries = () => {
       st.appendChild(pill);
     }
     card.appendChild(st);
-    card.onclick = () => openModal(p);
+    card.onclick=()=>openModal(p);
     frag.appendChild(card);
   }
   grid.appendChild(frag);
@@ -717,52 +804,43 @@ window.renderCountries = () => {
 
 // ── Modal ─────────────────────────────────────────────────────────────
 function openModal(p) {
-  curPais = p;
-  const fs = document.getElementById('modal-flag-span');
-  fs.textContent = EMOJI[p]||''; fs.style.fontSize='22px';
-  document.getElementById('modal-name').textContent = ' '+p+' — '+NAMES[p];
-  renderModalNums();
-  tw(fs);
+  curPais=p;
+  const fs=document.getElementById('modal-flag-span');
+  fs.textContent=EMOJI[p]||''; fs.style.fontSize='22px';
+  document.getElementById('modal-name').textContent=' '+p+' — '+NAMES[p];
+  renderModalNums(); tw(fs);
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow='hidden';
 }
 
 function renderModalNums() {
-  const p = curPais;
+  const p=curPais;
   if (!Array.isArray(missing[p])) missing[p]=[];
   if (!repeats[p]||Array.isArray(repeats[p])) repeats[p]={};
-  const grid = document.getElementById('modal-nums');
-  grid.innerHTML='';
+  const grid=document.getElementById('modal-nums'); grid.innerHTML='';
   for (let i=1;i<=getMax(p);i++) {
-    const inM   = missing[p].includes(i);
-    const cantR = parseInt(repeats[p][i])||0;
-    const btn   = document.createElement('button');
-    btn.textContent = i;
-    btn.className = inM ? 'num-btn missing-mark' : cantR>0 ? 'num-btn repeat-mark' : 'num-btn have-mark';
-    if (cantR>0 && !inM) {
+    const inM=missing[p].includes(i), cantR=parseInt(repeats[p][i])||0;
+    const btn=document.createElement('button');
+    btn.textContent=i;
+    btn.className=inM?'num-btn missing-mark':cantR>0?'num-btn repeat-mark':'num-btn have-mark';
+    if (cantR>0&&!inM) {
       const badge=document.createElement('div'); badge.className='num-btn-badge'; badge.textContent=cantR;
       btn.appendChild(badge);
     }
-    btn.onclick = async () => {
+    btn.onclick=async()=>{
       if (!Array.isArray(missing[p])) missing[p]=[];
       if (!repeats[p]||Array.isArray(repeats[p])) repeats[p]={};
-      const curM = missing[p].includes(i);
-      const curR = parseInt(repeats[p][i])||0;
-      if (!curM && curR===0) {
-        missing[p]=[...missing[p],i].sort((a,b)=>a-b);
-      } else if (curM && curR===0) {
-        missing[p]=missing[p].filter(x=>x!==i);
-        repeats[p][i]=1;
-      } else if (!curM && curR>0) {
-        repeats[p][i]=curR+1;
-      }
+      const curM=missing[p].includes(i), curR=parseInt(repeats[p][i])||0;
+      if (!curM&&curR===0)      missing[p]=[...missing[p],i].sort((a,b)=>a-b);
+      else if (curM&&curR===0) { missing[p]=missing[p].filter(x=>x!==i); repeats[p][i]=1; }
+      else if (!curM&&curR>0)   repeats[p][i]=curR+1;
       renderModalNums(); updateStats(); await syncToCloud();
     };
     let pressTimer;
-    btn.addEventListener('touchstart', ()=>{ pressTimer=setTimeout(async()=>{ await decreaseNum(p,i); },500); },{passive:true});
-    btn.addEventListener('touchend',   ()=>clearTimeout(pressTimer));
-    btn.addEventListener('touchmove',  ()=>clearTimeout(pressTimer));
-    btn.oncontextmenu = async e => { e.preventDefault(); await decreaseNum(p,i); };
+    btn.addEventListener('touchstart',()=>{ pressTimer=setTimeout(async()=>{ await decreaseNum(p,i); },500); },{passive:true});
+    btn.addEventListener('touchend',  ()=>clearTimeout(pressTimer));
+    btn.addEventListener('touchmove', ()=>clearTimeout(pressTimer));
+    btn.oncontextmenu=async e=>{ e.preventDefault(); await decreaseNum(p,i); };
     grid.appendChild(btn);
   }
 }
@@ -770,15 +848,14 @@ function renderModalNums() {
 async function decreaseNum(p,i) {
   if (!Array.isArray(missing[p])) missing[p]=[];
   if (!repeats[p]||Array.isArray(repeats[p])) repeats[p]={};
-  const curR = parseInt(repeats[p][i])||0;
-  const curM = missing[p].includes(i);
+  const curR=parseInt(repeats[p][i])||0, curM=missing[p].includes(i);
   if (curR>1)        repeats[p][i]=curR-1;
   else if (curR===1) delete repeats[p][i];
   else if (curM)     missing[p]=missing[p].filter(x=>x!==i);
   renderModalNums(); updateStats(); await syncToCloud();
 }
 
-window.closeModal = e => {
+window.closeModal=e=>{
   if (!e||e.target===document.getElementById('modal-bg')) {
     document.getElementById('modal-bg').classList.remove('open');
     document.body.style.overflow='';
@@ -786,7 +863,7 @@ window.closeModal = e => {
   }
 };
 
-window.shareCountry = () => {
+window.shareCountry=()=>{
   const p=curPais, m=missing[p]||[], r=repeats[p]||{};
   const rList=Object.entries(r).filter(([,c])=>parseInt(c)>0).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([n,c])=>parseInt(c)>1?`${p}${n}(x${c})`:`${p}${n}`);
   let txt=`⚽ Figus Panini WC2026 — ${EMOJI[p]||''} ${NAMES[p]}\n`;
@@ -796,25 +873,25 @@ window.shareCountry = () => {
 };
 
 // ── Cross ─────────────────────────────────────────────────────────────
-window.doCross = () => {
-  const { repeats: offered } = parseUniversal(document.getElementById('cross-input').value);
+window.doCross=()=>{
+  const {repeats:offered}=parseUniversal(document.getElementById('cross-input').value);
   const matches=[];
   for (const p of PAISES) {
     const myMis=new Set(missing[p]||[]);
     for (const [nStr,cant] of Object.entries(offered[p]||{})) {
-      if (parseInt(cant)>0 && myMis.has(parseInt(nStr))) matches.push(`${p}${nStr}`);
+      if (parseInt(cant)>0&&myMis.has(parseInt(nStr))) matches.push(`${p}${nStr}`);
     }
   }
-  document.getElementById('cross-result').textContent = matches.length ? matches.join(', ') : 'Ninguna coincide :(';
-  document.getElementById('cross-count').textContent  = matches.length+' figuritas coinciden';
+  document.getElementById('cross-result').textContent=matches.length?matches.join(', '):'Ninguna coincide :(';
+  document.getElementById('cross-count').textContent=matches.length+' figuritas coinciden';
   document.getElementById('cross-result-panel').style.display='block';
 };
-window.clearCross = () => {
+window.clearCross=()=>{
   document.getElementById('cross-input').value='';
   document.getElementById('cross-result-panel').style.display='none';
 };
-window.shareCrossWA = () => openWA(`⚽ Figus Panini WC2026 — Las que me sirven:\n${document.getElementById('cross-result').textContent}\n¿Cambiamos? 🤝`);
-window.copyCross = () => navigator.clipboard.writeText(document.getElementById('cross-result').textContent).then(()=>showToast('COPIADO!')).catch(()=>{});
+window.shareCrossWA=()=>openWA(`⚽ Figus Panini WC2026 — Las que me sirven:\n${document.getElementById('cross-result').textContent}\n¿Cambiamos? 🤝`);
+window.copyCross=()=>navigator.clipboard.writeText(document.getElementById('cross-result').textContent).then(()=>showToast('COPIADO!')).catch(()=>{});
 
 // ── Share ─────────────────────────────────────────────────────────────
 function buildShareText(type) {
@@ -837,19 +914,19 @@ function buildShareText(type) {
   }
   return lines.join('\n');
 }
-window.shareAll = (type,mode) => {
+window.shareAll=(type,mode)=>{
   const txt=buildShareText(type);
   if (mode==='wa') openWA(txt);
   else navigator.clipboard.writeText(txt).then(()=>showToast('COPIADO!')).catch(()=>{});
 };
-window.setPreview = t => {
+window.setPreview=t=>{
   curPreviewType=t;
   document.getElementById('share-preview-box').textContent=buildShareText(t);
   ['missing','repeats','both'].forEach(x=>document.getElementById('pt-'+x).classList.toggle('active',x===t));
 };
 
 // ── Navigation ─────────────────────────────────────────────────────────
-window.showTab = t => {
+window.showTab=t=>{
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['album','comu','cross','share','import'][i]===t));
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
