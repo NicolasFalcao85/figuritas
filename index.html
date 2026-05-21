@@ -88,12 +88,16 @@ body{display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .user-row-card{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg2);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)}
 .user-info-name{font-size:14px;font-weight:700;color:var(--text)}
 .user-info-pct{font-size:11px;color:var(--text2);margin-top:2px}
-.opp-box{background:var(--bg2);border-radius:8px;padding:10px 12px;border-left:3px solid var(--gold);margin-bottom:12px}
-.opp-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:var(--gold);margin-bottom:8px}
-.opp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.opp-label{font-size:11px;font-weight:700;margin-bottom:5px}
-.opp-label.green{color:#1a7a3c}
-.opp-label.red{color:var(--red)}
+.deal-section{margin-bottom:12px}
+.deal-section-title{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px;padding:4px 0;border-bottom:1px solid var(--border)}
+.deal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.deal-label{font-size:11px;font-weight:700;margin-bottom:5px}
+.deal-label.green{color:#1a7a3c}
+.deal-label.red{color:var(--red)}
+.opp-box{background:var(--bg2);border-radius:8px;padding:10px 12px;border-left:3px solid var(--gold)}
+.opp-header{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.opp-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:var(--gold)}
+.opp-note{font-size:10px;color:var(--text2);margin-top:8px;line-height:1.4}
 .share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
 .share-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
 .share-icon-small{font-size:22px;display:block;margin-bottom:6px}
@@ -115,7 +119,7 @@ textarea{width:100%;min-height:140px;font-family:monospace;font-size:12px;paddin
 textarea:focus{border-color:var(--blue);outline:none}
 .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
 .panel-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--blue);margin-bottom:8px;border-bottom:2px solid var(--gold);padding-bottom:5px}
-.result-box{background:var(--bg2);border-radius:8px;padding:10px;font-size:13px;line-height:1.8;min-height:44px;word-break:break-all;border-left:3px solid var(--blue);color:var(--text)}
+.result-box{background:var(--bg2);border-radius:8px;padding:10px;font-size:12px;line-height:1.7;min-height:40px;word-break:break-all;border-left:3px solid var(--blue);color:var(--text)}
 .tip{font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.4}
 .status-ok{background:#f0fff4;color:#1a7a3c;border:1.5px solid #81c784;padding:12px;border-radius:8px;font-weight:700;font-size:13px;margin-top:10px;display:block}
 .status-err{background:#fff0f0;color:#c0392b;border:1.5px solid #f5c6c6;padding:12px;border-radius:8px;font-weight:700;font-size:13px;margin-top:10px;display:block}
@@ -220,37 +224,42 @@ textarea:focus{border-color:var(--blue);outline:none}
     </div>
 
     <div class="panel" id="panel-deal-result" style="display:none">
-      <div class="panel-title" id="deal-title">Trato equitativo sugerido</div>
+      <div class="panel-title" id="deal-title">Análisis de cruce</div>
 
-      <!-- Trato con repetidas -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-        <div>
-          <div class="opp-label green" style="margin-bottom:5px">Sus repes · te faltan</div>
-          <div class="result-box" id="deal-he-gives">—</div>
-        </div>
-        <div>
-          <div class="opp-label red" style="margin-bottom:5px">Tus repes · le faltan</div>
-          <div class="result-box" id="deal-you-give">—</div>
+      <!-- Trato equitativo -->
+      <div class="deal-section">
+        <div class="deal-section-title">🔄 TRATO CON REPETIDAS</div>
+        <div class="deal-grid">
+          <div>
+            <div class="deal-label green">Sus repes · te faltan</div>
+            <div class="result-box" id="deal-he-gives" style="margin-top:4px">—</div>
+          </div>
+          <div>
+            <div class="deal-label red">Tus repes · le faltan</div>
+            <div class="result-box" id="deal-you-give" style="margin-top:4px">—</div>
+          </div>
         </div>
       </div>
 
       <!-- Oportunidad -->
-      <div class="opp-box" id="deal-opportunity" style="display:none">
-        <div class="opp-title">💡 OPORTUNIDAD — figuritas únicas</div>
-        <div class="opp-grid">
-          <div>
-            <div class="opp-label green">Él tiene · vos necesitás</div>
-            <div class="result-box" id="opp-he-has" style="font-size:11px;border-left-color:var(--gold);margin-top:4px">—</div>
+      <div class="deal-section">
+        <div class="deal-section-title">💡 OPORTUNIDAD — figuritas únicas</div>
+        <div class="opp-box">
+          <div class="deal-grid">
+            <div>
+              <div class="deal-label green">Él tiene · vos necesitás</div>
+              <div class="result-box" id="opp-he-has" style="margin-top:4px;border-left-color:var(--gold)">—</div>
+            </div>
+            <div>
+              <div class="deal-label red">Vos tenés · él necesita</div>
+              <div class="result-box" id="opp-you-have" style="margin-top:4px;border-left-color:var(--gold)">—</div>
+            </div>
           </div>
-          <div>
-            <div class="opp-label red">Vos tenés · él necesita</div>
-            <div class="result-box" id="opp-you-have" style="font-size:11px;border-left-color:var(--gold);margin-top:4px">—</div>
-          </div>
+          <div class="opp-note">Son figuritas únicas de cada uno — habría que negociar si quieren cederlas.</div>
         </div>
-        <div style="font-size:10px;color:var(--text2);margin-top:8px">Son figuritas únicas — habría que negociar si quieren cederlas.</div>
       </div>
 
-      <button class="btn btn-wa btn-block" id="deal-wa-btn">
+      <button class="btn btn-wa btn-block" id="deal-wa-btn" style="margin-top:4px">
         <i class="ti ti-brand-whatsapp"></i> Proponer cambio por WhatsApp
       </button>
     </div>
@@ -476,7 +485,7 @@ function listenCommunity() {
       if (currentUser && uid === currentUser.uid) return;
       let have = 0;
       for (const p of PAISES) {
-        const mSet = new Set(u.missing?.[p] || []);
+        const mSet = new Set(Array.isArray(u.missing?.[p]) ? u.missing[p] : []);
         for (let i = 1; i <= getMax(p); i++) if (!mSet.has(i)) have++;
       }
       const pct = Math.round((have / TOTAL_FIGUS) * 100);
@@ -491,44 +500,63 @@ function listenCommunity() {
   });
 }
 
-// ── Deal calculator con Oportunidad ──────────────────────────────────
+// ── Deal calculator ───────────────────────────────────────────────────
 function calcDeal(friendId) {
-  const f = globalUsersDB[friendId]; if (!f) return;
+  const f = globalUsersDB[friendId];
+  if (!f) return;
+
+  // Reset UI
+  ['deal-he-gives','deal-you-give','opp-he-has','opp-you-have'].forEach(id => {
+    document.getElementById(id).textContent = 'Calculando...';
+  });
+  document.getElementById('panel-deal-result').style.display = 'block';
 
   const heGives          = [];  // sus repes ∩ mis faltantes
   const youGive          = [];  // mis repes ∩ sus faltantes
-  const heHasYouMissing  = [];  // él tiene (única) ∩ yo necesito
-  const youHaveHeMissing = [];  // yo tengo (única) ∩ él necesita
+  const heHasYouMissing  = [];  // él tiene única ∩ yo necesito
+  const youHaveHeMissing = [];  // yo tengo única ∩ él necesita
 
   for (const p of PAISES) {
-    const frRep  = f.repeats?.[p]  || {};
-    const frMis  = f.missing?.[p]  || [];
-    const myRep  = repeats[p]      || {};
-    const myMis  = missing[p]      || [];
+    const max = getMax(p);
+
+    // Normalizar datos del amigo — defensivo ante cualquier formato
+    const frRepRaw = f.repeats?.[p];
+    const frMisRaw = f.missing?.[p];
+    const frRep    = (frRepRaw && typeof frRepRaw === 'object' && !Array.isArray(frRepRaw)) ? frRepRaw : {};
+    const frMis    = Array.isArray(frMisRaw) ? frMisRaw : [];
+
+    // Mis datos (ya normalizados en onSnapshot)
+    const myRep    = (repeats[p] && typeof repeats[p] === 'object' && !Array.isArray(repeats[p])) ? repeats[p] : {};
+    const myMis    = Array.isArray(missing[p]) ? missing[p] : [];
+
     const myMisSet = new Set(myMis);
     const frMisSet = new Set(frMis);
-    const max    = getMax(p);
 
-    // Trato equitativo — repetidas
+    // Trato equitativo — sus repes que me faltan
     for (const [nStr, cant] of Object.entries(frRep)) {
-      if (parseInt(cant) > 0 && myMisSet.has(parseInt(nStr))) heGives.push(`${p}${nStr}`);
+      if (parseInt(cant) > 0 && myMisSet.has(parseInt(nStr))) {
+        heGives.push(`${p}${nStr}`);
+      }
     }
+    // Trato equitativo — mis repes que le faltan
     for (const [nStr, cant] of Object.entries(myRep)) {
-      if (parseInt(cant) > 0 && frMisSet.has(parseInt(nStr))) youGive.push(`${p}${nStr}`);
+      if (parseInt(cant) > 0 && frMisSet.has(parseInt(nStr))) {
+        youGive.push(`${p}${nStr}`);
+      }
     }
 
-    // Oportunidad — figuritas únicas (no repe, no falta)
+    // Oportunidad — figuritas únicas (tengo pero no es repe ni falta)
     for (let i = 1; i <= max; i++) {
-      const myIsMissing  = myMisSet.has(i);
-      const myIsRepeat   = (parseInt(myRep[i]) || 0) > 0;
-      const frIsMissing  = frMisSet.has(i);
-      const frIsRepeat   = (parseInt(frRep[i]) || 0) > 0;
+      const myIsMissing = myMisSet.has(i);
+      const myIsRepeat  = (parseInt(myRep[i]) || 0) > 0;
+      const frIsMissing = frMisSet.has(i);
+      const frIsRepeat  = (parseInt(frRep[i]) || 0) > 0;
 
-      // yo tengo única (no falta, no repe) y él la necesita
+      // yo tengo única (pegada, no repe) y él la necesita
       if (!myIsMissing && !myIsRepeat && frIsMissing) {
         youHaveHeMissing.push(`${p}${i}`);
       }
-      // él tiene única (no falta, no repe) y yo la necesito
+      // él tiene única (pegada, no repe) y yo la necesito
       if (!frIsMissing && !frIsRepeat && myIsMissing) {
         heHasYouMissing.push(`${p}${i}`);
       }
@@ -539,41 +567,35 @@ function calcDeal(friendId) {
   const hg  = heGives.slice(0, qty);
   const yg  = youGive.slice(0, qty);
 
-  // Trato equitativo
+  // Actualizar UI — Trato
   document.getElementById('deal-title').textContent =
-    qty > 0 ? `Trato equitativo con repetidas: ${qty} × ${qty}` : 'Sin coincidencias en repetidas';
-  document.getElementById('deal-he-gives').textContent = hg.join(', ') || 'Ninguna';
-  document.getElementById('deal-you-give').textContent = yg.join(', ') || 'Ninguna';
+    qty > 0 ? `Trato equitativo: ${qty} × ${qty} figuritas` : 'Sin coincidencias en repetidas';
+  document.getElementById('deal-he-gives').textContent = hg.length ? hg.join(', ') : 'Ninguna';
+  document.getElementById('deal-you-give').textContent = yg.length ? yg.join(', ') : 'Ninguna';
 
-  // Oportunidad
-  const oppPanel = document.getElementById('deal-opportunity');
-  oppPanel.style.display = (heHasYouMissing.length || youHaveHeMissing.length) ? 'block' : 'none';
-  document.getElementById('opp-he-has').textContent  = heHasYouMissing.join(', ')  || 'Ninguna';
-  document.getElementById('opp-you-have').textContent = youHaveHeMissing.join(', ') || 'Ninguna';
-
-  document.getElementById('panel-deal-result').style.display = 'block';
+  // Actualizar UI — Oportunidad (siempre visible)
+  document.getElementById('opp-he-has').textContent  =
+    heHasYouMissing.length  ? heHasYouMissing.join(', ')  : 'Ninguna';
+  document.getElementById('opp-you-have').textContent =
+    youHaveHeMissing.length ? youHaveHeMissing.join(', ') : 'Ninguna';
 
   // WhatsApp
   document.getElementById('deal-wa-btn').onclick = () => {
-    let txt = `⚽ *¡Hola! Crucé nuestros álbumes del Mundial 2026:*\n`;
-
-    if (qty > 0) {
-      txt += `\n🔄 *Trato equitativo con repetidas (${qty}×${qty}):*\n`;
-      txt += `➕ Me das: ${hg.join(', ')}\n`;
-      txt += `➖ Te doy: ${yg.join(', ')}\n`;
-    }
-
-    if (heHasYouMissing.length > 0) {
-      txt += `\n💡 *Oportunidad — vos tenés y me faltan:*\n${heHasYouMissing.join(', ')}\n`;
-    }
-    if (youHaveHeMissing.length > 0) {
-      txt += `\n💡 *Oportunidad — yo tengo y te faltan:*\n${youHaveHeMissing.join(', ')}\n`;
-    }
-
     if (!qty && !heHasYouMissing.length && !youHaveHeMissing.length) {
       alert('No hay figuritas para intercambiar.'); return;
     }
-
+    let txt = `⚽ *¡Hola! Crucé nuestros álbumes del Mundial 2026:*\n`;
+    if (qty > 0) {
+      txt += `\n🔄 *Trato con repetidas (${qty}×${qty}):*\n`;
+      txt += `➕ Me das: ${hg.join(', ')}\n`;
+      txt += `➖ Te doy: ${yg.join(', ')}\n`;
+    }
+    if (heHasYouMissing.length > 0) {
+      txt += `\n💡 *Vos tenés pegadas y me faltan (a negociar):*\n${heHasYouMissing.join(', ')}\n`;
+    }
+    if (youHaveHeMissing.length > 0) {
+      txt += `\n💡 *Yo tengo pegadas y te faltan (a negociar):*\n${youHaveHeMissing.join(', ')}\n`;
+    }
     txt += `\n¿Hablamos y arreglamos algo? 🤝`;
     window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank');
   };
@@ -604,7 +626,6 @@ function parseUniversal(text) {
   const isFiguApp     = !hasHashLines && !isAlbumMaster &&
     (/me faltan/i.test(text) || /^repetidas/im.test(text) || /figuritas app/i.test(text));
 
-  // ── WhatsApp #CODE ────────────────────────────────────────────────
   if (hasHashLines) {
     let mode = null;
     for (const raw of text.split('\n')) {
@@ -633,7 +654,6 @@ function parseUniversal(text) {
     return { missing:mis, repeats:rep, fmt:'WhatsApp #CODE' };
   }
 
-  // ── Album Master ──────────────────────────────────────────────────
   if (isAlbumMaster) {
     let mode=null;
     for (const raw of text.split('\n')) {
@@ -657,7 +677,6 @@ function parseUniversal(text) {
     return { missing:mis, repeats:rep, fmt:'Album Master' };
   }
 
-  // ── Figuritas App ─────────────────────────────────────────────────
   if (isFiguApp) {
     let mode=null;
     for (const raw of text.split('\n')) {
