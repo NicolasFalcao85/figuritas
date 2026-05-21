@@ -505,98 +505,70 @@ function calcDeal(friendId) {
   const f = globalUsersDB[friendId];
   if (!f) return;
 
-  // Reset UI
   ['deal-he-gives','deal-you-give','opp-he-has','opp-you-have'].forEach(id => {
     document.getElementById(id).textContent = 'Calculando...';
   });
   document.getElementById('panel-deal-result').style.display = 'block';
 
-  const heGives          = [];  // sus repes ∩ mis faltantes
-  const youGive          = [];  // mis repes ∩ sus faltantes
-  const heHasYouMissing  = [];  // él tiene única ∩ yo necesito
-  const youHaveHeMissing = [];  // yo tengo única ∩ él necesita
+  const heGives    = [];  // sus repes ∩ mis faltantes  (para trato)
+  const youGive    = [];  // mis repes ∩ sus faltantes  (para trato)
+  const oppHeGives = [];  // sus repes ∩ mis faltantes, SIN trato recíproco posible
+  const oppYouGive = [];  // mis repes ∩ sus faltantes, SIN trato recíproco posible
 
   for (const p of PAISES) {
-    const max = getMax(p);
-
-    // Normalizar datos del amigo — defensivo ante cualquier formato
-    const frRepRaw = f.repeats?.[p];
-    const frMisRaw = f.missing?.[p];
-    const frRep    = (frRepRaw && typeof frRepRaw === 'object' && !Array.isArray(frRepRaw)) ? frRepRaw : {};
-    const frMis    = Array.isArray(frMisRaw) ? frMisRaw : [];
-
-    // Mis datos (ya normalizados en onSnapshot)
-    const myRep    = (repeats[p] && typeof repeats[p] === 'object' && !Array.isArray(repeats[p])) ? repeats[p] : {};
-    const myMis    = Array.isArray(missing[p]) ? missing[p] : [];
-
+    const frRep = (f.repeats?.[p] && !Array.isArray(f.repeats[p])) ? f.repeats[p] : {};
+    const frMis = Array.isArray(f.missing?.[p]) ? f.missing[p] : [];
+    const myRep = (repeats[p] && !Array.isArray(repeats[p])) ? repeats[p] : {};
+    const myMis = Array.isArray(missing[p]) ? missing[p] : [];
     const myMisSet = new Set(myMis);
     const frMisSet = new Set(frMis);
 
-    // Trato equitativo — sus repes que me faltan
     for (const [nStr, cant] of Object.entries(frRep)) {
-      if (parseInt(cant) > 0 && myMisSet.has(parseInt(nStr))) {
-        heGives.push(`${p}${nStr}`);
-      }
+      if (parseInt(cant) > 0 && myMisSet.has(parseInt(nStr))) heGives.push(`${p}${nStr}`);
     }
-    // Trato equitativo — mis repes que le faltan
     for (const [nStr, cant] of Object.entries(myRep)) {
-      if (parseInt(cant) > 0 && frMisSet.has(parseInt(nStr))) {
-        youGive.push(`${p}${nStr}`);
-      }
-    }
-
-    // Oportunidad — figuritas únicas (tengo pero no es repe ni falta)
-    for (let i = 1; i <= max; i++) {
-      const myIsMissing = myMisSet.has(i);
-      const myIsRepeat  = (parseInt(myRep[i]) || 0) > 0;
-      const frIsMissing = frMisSet.has(i);
-      const frIsRepeat  = (parseInt(frRep[i]) || 0) > 0;
-
-      // yo tengo única (pegada, no repe) y él la necesita
-      if (!myIsMissing && !myIsRepeat && frIsMissing) {
-        youHaveHeMissing.push(`${p}${i}`);
-      }
-      // él tiene única (pegada, no repe) y yo la necesito
-      if (!frIsMissing && !frIsRepeat && myIsMissing) {
-        heHasYouMissing.push(`${p}${i}`);
-      }
+      if (parseInt(cant) > 0 && frMisSet.has(parseInt(nStr))) youGive.push(`${p}${nStr}`);
     }
   }
 
+  // Trato equitativo: hasta donde alcanza la simetría
   const qty = Math.min(heGives.length, youGive.length);
   const hg  = heGives.slice(0, qty);
   const yg  = youGive.slice(0, qty);
 
-  // Actualizar UI — Trato
+  // Oportunidad: lo que sobra de cada lado después del trato
+  // Él puede darme más de lo que yo le puedo dar → me conviene pedirle igualmente
+  const oppHe  = heGives.slice(qty);   // sus repes extras que me sirven, sin contrapartida mía
+  const oppYou = youGive.slice(qty);   // mis repes extras que le sirven, sin contrapartida suya
+
+  // UI — Trato
   document.getElementById('deal-title').textContent =
-    qty > 0 ? `Trato equitativo: ${qty} × ${qty} figuritas` : 'Sin coincidencias en repetidas';
+    qty > 0 ? `Trato equitativo: ${qty} × ${qty} figuritas` : 'Sin trato simétrico posible';
   document.getElementById('deal-he-gives').textContent = hg.length ? hg.join(', ') : 'Ninguna';
   document.getElementById('deal-you-give').textContent = yg.length ? yg.join(', ') : 'Ninguna';
 
-  // Actualizar UI — Oportunidad (siempre visible)
-  document.getElementById('opp-he-has').textContent  =
-    heHasYouMissing.length  ? heHasYouMissing.join(', ')  : 'Ninguna';
-  document.getElementById('opp-you-have').textContent =
-    youHaveHeMissing.length ? youHaveHeMissing.join(', ') : 'Ninguna';
+  // UI — Oportunidad
+  document.getElementById('opp-he-has').textContent  = oppHe.length  ? oppHe.join(', ')  : 'Ninguna';
+  document.getElementById('opp-you-have').textContent = oppYou.length ? oppYou.join(', ') : 'Ninguna';
 
   // WhatsApp
   document.getElementById('deal-wa-btn').onclick = () => {
-    if (!qty && !heHasYouMissing.length && !youHaveHeMissing.length) {
+    if (!qty && !oppHe.length && !oppYou.length) {
       alert('No hay figuritas para intercambiar.'); return;
     }
     let txt = `⚽ *¡Hola! Crucé nuestros álbumes del Mundial 2026:*\n`;
     if (qty > 0) {
-      txt += `\n🔄 *Trato con repetidas (${qty}×${qty}):*\n`;
+      txt += `\n🔄 *Trato equitativo (${qty}×${qty}):*\n`;
       txt += `➕ Me das: ${hg.join(', ')}\n`;
       txt += `➖ Te doy: ${yg.join(', ')}\n`;
     }
-    if (heHasYouMissing.length > 0) {
-      txt += `\n💡 *Vos tenés pegadas y me faltan (a negociar):*\n${heHasYouMissing.join(', ')}\n`;
+    if (oppHe.length > 0) {
+      txt += `\n💡 *También tenés repetidas que me faltan (a negociar):*\n${oppHe.join(', ')}\n`;
     }
-    if (youHaveHeMissing.length > 0) {
-      txt += `\n💡 *Yo tengo pegadas y te faltan (a negociar):*\n${youHaveHeMissing.join(', ')}\n`;
+    if (oppYou.length > 0) {
+      txt += `\n💡 *También yo tengo repetidas que te faltan (a negociar):*\n${oppYou.join(', ')}\n`;
     }
-    txt += `\n¿Hablamos y arreglamos algo? 🤝`;
+    txt += `\n¿Hablamos? 🤝`;
     window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank');
   };
 
