@@ -211,42 +211,21 @@ textarea:focus{border-color:var(--blue);outline:none}
       <div id="community-users-list"><div style="color:var(--text2);font-size:13px">Cargando...</div></div>
     </div>
     <div class="panel" id="panel-deal-result" style="display:none">
-  <div class="panel-title" id="deal-title">Trato equitativo sugerido</div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-    <div>
-      <h4 style="font-size:12px;color:#1a7a3c;margin-bottom:6px;font-weight:700">Te da (sus repes que te faltan)</h4>
-      <div class="result-box" id="deal-he-gives">—</div>
-    </div>
-    <div>
-      <h4 style="font-size:12px;color:var(--red);margin-bottom:6px;font-weight:700">Le das (tus repes que le faltan)</h4>
-      <div class="result-box" id="deal-you-give">—</div>
-    </div>
-  </div>
-
-  <div id="deal-opportunity" style="display:none;margin-bottom:12px">
-    <div style="background:var(--bg2);border-radius:8px;padding:10px 12px;border-left:3px solid var(--gold)">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:var(--gold);margin-bottom:8px">
-        💡 OPORTUNIDAD — Sin usar repetidas
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="panel-title" id="deal-title">Trato equitativo sugerido</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
         <div>
-          <h4 style="font-size:11px;color:#1a7a3c;margin-bottom:5px;font-weight:700">Él tiene · vos necesitás</h4>
-          <div class="result-box" id="opp-he-has" style="font-size:11px;border-left-color:var(--gold)">—</div>
+          <h4 style="font-size:12px;color:#1a7a3c;margin-bottom:6px;font-weight:700">Te da (te sirven)</h4>
+          <div class="result-box" id="deal-he-gives">—</div>
         </div>
         <div>
-          <h4 style="font-size:11px;color:var(--red);margin-bottom:5px;font-weight:700">Vos tenés · él necesita</h4>
-          <div class="result-box" id="opp-you-have" style="font-size:11px;border-left-color:var(--gold)">—</div>
+          <h4 style="font-size:12px;color:var(--red);margin-bottom:6px;font-weight:700">Le das (le sirven)</h4>
+          <div class="result-box" id="deal-you-give">—</div>
         </div>
       </div>
-      <div style="font-size:10px;color:var(--text2);margin-top:6px">Estas las tenés/tiene de una sola — habría que negociar si quieren cederlas.</div>
+      <button class="btn btn-wa btn-block" id="deal-wa-btn">
+        <i class="ti ti-brand-whatsapp"></i> Proponer cambio por WhatsApp
+      </button>
     </div>
-  </div>
-
-  <button class="btn btn-wa btn-block" id="deal-wa-btn">
-    <i class="ti ti-brand-whatsapp"></i> Proponer cambio por WhatsApp
-  </button>
-</div>
   </div>
 
   <div id="tab-cross" class="section">
@@ -485,74 +464,32 @@ function listenCommunity() {
 function calcDeal(friendId) {
   const f = globalUsersDB[friendId]; if (!f) return;
   const heGives = [], youGive = [];
-  const youHaveHeMissing = [], heHasYouMissing = [];
-
   for (const p of PAISES) {
     const frRep = f.repeats?.[p] || {};
     const myMis = new Set(missing[p]||[]);
-    const frMis = new Set(f.missing?.[p]||[]);
-    const myRep = repeats[p]||{};
-    const max   = getMax(p);
-
-    // Trato equitativo: sus repes ∩ mis faltantes
     for (const [nStr, cant] of Object.entries(frRep)) {
-      if (parseInt(cant)>0 && myMis.has(parseInt(nStr))) heGives.push(`${p}${nStr}`);
-    }
-    // Trato equitativo: mis repes ∩ sus faltantes
-    for (const [nStr, cant] of Object.entries(myRep)) {
-      if (parseInt(cant)>0 && frMis.has(parseInt(nStr))) youGive.push(`${p}${nStr}`);
-    }
-
-    // Oportunidad: yo tengo (no falta, no repe) ∩ él necesita
-    for (let i=1; i<=max; i++) {
-      const iTengo  = !missing[p].includes(i) && !(parseInt(myRep[i])||0);
-      const elFalta = frMis.has(i);
-      if (iTengo && elFalta) youHaveHeMissing.push(`${p}${i}`);
-    }
-    // Oportunidad: él tiene (no falta, no repe) ∩ yo necesito
-    for (let i=1; i<=max; i++) {
-      const elTiene = !( f.missing?.[p]||[] ).includes(i) && !(parseInt(f.repeats?.[p]?.[i])||0);
-      const yoFalto = myMis.has(i);
-      if (elTiene && yoFalto) heHasYouMissing.push(`${p}${i}`);
+      if (parseInt(cant) > 0 && myMis.has(parseInt(nStr))) heGives.push(`${p}${nStr}`);
     }
   }
-
+  for (const p of PAISES) {
+    const myRep = repeats[p]||{};
+    const frMis = new Set(f.missing?.[p]||[]);
+    for (const [nStr, cant] of Object.entries(myRep)) {
+      if (parseInt(cant) > 0 && frMis.has(parseInt(nStr))) youGive.push(`${p}${nStr}`);
+    }
+  }
   const qty = Math.min(heGives.length, youGive.length);
   const hg  = heGives.slice(0, qty);
   const yg  = youGive.slice(0, qty);
-
-  document.getElementById('deal-title').textContent =
-    qty > 0 ? `Trato equitativo: ${qty} × ${qty}` : 'Sin coincidencias en repetidas';
+  document.getElementById('deal-title').textContent = qty > 0 ? `Trato equitativo: ${qty} × ${qty}` : 'Sin coincidencias simétricas';
   document.getElementById('deal-he-gives').textContent = hg.join(', ')||'Ninguna';
   document.getElementById('deal-you-give').textContent = yg.join(', ')||'Ninguna';
-
-  // Oportunidad
-  const oppPanel = document.getElementById('deal-opportunity');
-  const oppHe    = document.getElementById('opp-he-has');
-  const oppYou   = document.getElementById('opp-you-have');
-  oppPanel.style.display = 'block';
-  oppHe.textContent  = heHasYouMissing.length  ? heHasYouMissing.join(', ')  : 'Ninguna';
-  oppYou.textContent = youHaveHeMissing.length ? youHaveHeMissing.join(', ') : 'Ninguna';
-
   document.getElementById('panel-deal-result').style.display = 'block';
   document.getElementById('deal-wa-btn').onclick = () => {
-    if (!qty && !heHasYouMissing.length && !youHaveHeMissing.length) {
-      alert('No hay figuritas para intercambiar.'); return;
-    }
-    let txt = `⚽ *¡Hola! Te propongo un cambio de figus del Mundial 2026:*\n`;
-    if (qty) {
-      txt += `\n🔄 *Trato con repetidas (${qty}×${qty}):*\n`;
-      txt += `➕ Me das: ${hg.join(', ')}\n`;
-      txt += `➖ Te doy: ${yg.join(', ')}\n`;
-    }
-    if (heHasYouMissing.length || youHaveHeMissing.length) {
-      txt += `\n💡 *También podrías darme (las tenés y me faltan):*\n${heHasYouMissing.join(', ')||'—'}\n`;
-      txt += `\n💡 *Y yo podría darte (las tengo y te faltan):*\n${youHaveHeMissing.join(', ')||'—'}\n`;
-    }
-    txt += `\n¿Hablamos? 🤝`;
+    if (!qty) { alert('No hay figuritas simétricas para intercambiar.'); return; }
+    const txt = `⚽ *¡Hola! Te propongo un cambio de figus del Mundial 2026:*\n\n➕ *Me das (${hg.length}):* ${hg.join(', ')}\n➖ *Te doy (${yg.length}):* ${yg.join(', ')}\n\n¿Te sirve? ¡Avisame! 🤝`;
     window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
   };
-
   document.getElementById('panel-deal-result').scrollIntoView({behavior:'smooth'});
 }
 
